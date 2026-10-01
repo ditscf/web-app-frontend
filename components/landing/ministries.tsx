@@ -2,6 +2,7 @@
 
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { SectionHeader } from '@/components/landing/section-header';
 import { Badge } from '@/components/ui/badge';
@@ -21,9 +22,9 @@ export function Ministries() {
           text="Teams are built around spiritual discipline, creative excellence, and practical ministry."
         />
         <Button asChild variant="default" size="lg">
-          <a href="#contact">
+          <Link href="/auth/signin">
             Find Your Team <ChevronRight size={18} />
-          </a>
+          </Link>
         </Button>
       </div>
       <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -53,8 +54,10 @@ export function Ministries() {
                   <Badge key={activity}>{activity}</Badge>
                 ))}
               </div>
-              <Button variant="ghost" className="mt-5 px-0 text-royal">
-                Join Ministry <ArrowRight size={16} />
+              <Button asChild variant="ghost" className="mt-5 px-0 text-royal">
+                <Link href="/auth/signin">
+                  Join Ministry <ArrowRight size={16} />
+                </Link>
               </Button>
             </div>
           </MotionCard>

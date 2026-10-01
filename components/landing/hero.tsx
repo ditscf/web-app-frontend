@@ -2,6 +2,7 @@
 
 import { ArrowRight, Play, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { AnimatedNumber } from '@/components/landing/animated-number';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,9 +45,9 @@ export function Hero() {
             </h1>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button asChild variant="gold" size="lg">
-                <a href="#contact">
+                <Link href="/auth/signin">
                   Join Fellowship <ArrowRight size={18} />
-                </a>
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
                 <a href="#ministries">Explore Ministries</a>
