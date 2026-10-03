@@ -1,6 +1,6 @@
 'use client';
 
-import { House, Menu, X, type LucideIcon } from 'lucide-react';
+import { ClipboardCheck, House, Menu, X, type LucideIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -8,6 +8,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useCurrentActor } from '@/components/auth/current-actor-provider';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import { Button } from '@/components/ui/button';
+import type { ActorProfile } from '@/lib/api/auth';
+import { canReviewApplications } from '@/lib/auth/access';
 import { YEAR_STATUS_LABELS } from '@/lib/auth/responsibility-labels';
 import { ditscfLogoImage } from '@/lib/site-content';
 import { cn } from '@/lib/utils';
@@ -16,11 +18,16 @@ interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
+  /** A visibility rule from lib/auth/access.ts. The API still decides access to the page's data. */
+  isVisible: (actor: ActorProfile) => boolean;
 }
 
 type NavTone = 'dark' | 'light';
 
-const NAV_ITEMS: NavItem[] = [{ href: '/dashboard/home', label: 'Home', icon: House }];
+const NAV_ITEMS: NavItem[] = [
+  { href: '/dashboard/home', label: 'Home', icon: House, isVisible: () => true },
+  { href: '/dashboard/applications', label: 'Applications', icon: ClipboardCheck, isVisible: canReviewApplications },
+];
 
 const MOBILE_NAV_ID = 'dashboard-mobile-nav';
 
@@ -38,10 +45,12 @@ function DashboardBrand() {
 
 function DashboardNavLinks({ tone, onNavigate }: { tone: NavTone; onNavigate?: () => void }) {
   const pathname = usePathname();
+  const actor = useCurrentActor();
+  const visibleItems = NAV_ITEMS.filter((item) => item.isVisible(actor));
 
   return (
     <ul className="grid gap-1">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+      {visibleItems.map(({ href, label, icon: Icon }) => {
         const isActive = isActivePath(pathname, href);
         return (
           <li key={href}>

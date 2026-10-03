@@ -12,40 +12,46 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputOTP } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
-import { getCurrentActor, requestLoginCode, verifyLoginCode } from '@/lib/api/auth';
+import { DASHBOARD_HOME_PATH, ONBOARDING_PATH } from '@/constants/constant';
+import { getCurrentActor, requestLoginCode, verifyLoginCode, type ActorProfile } from '@/lib/api/auth';
 import { getUserFacingMessage, isApiError, toApiError } from '@/lib/api/errors';
+import { isOnboardingRequired } from '@/lib/auth/access';
 import { toSessionUser } from '@/lib/auth/session-user';
 import { cn } from '@/lib/utils';
 import { LOGIN_CODE_LENGTH, loginCodeSchema, loginEmailSchema } from '@/lib/validation';
 
 const CODE_INPUT_ID = 'verification-code';
-const AFTER_SIGN_IN_PATH = '/dashboard/home';
 const SESSION_NOT_KEPT_MESSAGE =
   "Your browser didn't keep the sign-in session. Allow cookies for this site and try again.";
 const FRONTEND_SESSION_ERROR_MESSAGE = "We couldn't finish signing you in. Please try again.";
 
 type SignInStep = 'email' | 'code';
 
-async function completeSignIn(email: string, code: string): Promise<string | null> {
+type SignInResult = { status: 'signed_in'; actor: ActorProfile } | { status: 'failed'; message: string };
+
+async function completeSignIn(email: string, code: string): Promise<SignInResult> {
   try {
     await verifyLoginCode(email, code);
   } catch (error) {
-    return getUserFacingMessage(error);
+    return { status: 'failed', message: getUserFacingMessage(error) };
   }
 
   let actor;
   try {
     actor = await getCurrentActor();
   } catch (error) {
-    if (isApiError(error) && error.kind === 'unauthenticated') return SESSION_NOT_KEPT_MESSAGE;
-    return getUserFacingMessage(error);
+    if (isApiError(error) && error.kind === 'unauthenticated') {
+      return { status: 'failed', message: SESSION_NOT_KEPT_MESSAGE };
+    }
+    return { status: 'failed', message: getUserFacingMessage(error) };
   }
 
   try {
     const result = await signIn('credentials', { ...toSessionUser(actor), redirect: false });
-    return result.ok && !result.error ? null : FRONTEND_SESSION_ERROR_MESSAGE;
+    if (result.ok && !result.error) return { status: 'signed_in', actor };
+    return { status: 'failed', message: FRONTEND_SESSION_ERROR_MESSAGE };
   } catch {
-    return FRONTEND_SESSION_ERROR_MESSAGE;
+    return { status: 'failed', message: FRONTEND_SESSION_ERROR_MESSAGE };
   }
 }
 
@@ -108,15 +114,15 @@ export function SignInForm() {
 
     setIsSigningIn(true);
     setCodeError(null);
-    const errorMessage = await completeSignIn(email, code);
-    if (errorMessage) {
-      setCodeError(errorMessage);
+    const result = await completeSignIn(email, code);
+    if (result.status === 'failed') {
+      setCodeError(result.message);
       setIsSigningIn(false);
       return;
     }
 
     toast.success('Signed in successfully', { description: 'Welcome back to DITSCF.' });
-    router.replace(AFTER_SIGN_IN_PATH);
+    router.replace(isOnboardingRequired(result.actor) ? ONBOARDING_PATH : DASHBOARD_HOME_PATH);
   }
 
   async function handleResendCode() {

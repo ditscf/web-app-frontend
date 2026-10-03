@@ -29,7 +29,7 @@ All steps run in the browser, because only the browser can receive the API's `Se
 2. `POST /v1/auth/login/verify` with the email and 6-digit code. On success the API sets `ditscf.session`. A `401` here means a wrong or expired code, so it is excluded from the global `401` handling.
 3. `GET /v1/auth/me` confirms the browser kept the cookie. If this returns `401` straight after a successful verify, the browser is blocking the API cookie, and the form asks the user to allow cookies.
 4. `signIn('credentials', …)` creates the Auth.js session from the `/me` profile (name, email, and account id only).
-5. The user is sent to `/dashboard/home`.
+5. The user is sent to `/onboarding` if they have not finished onboarding, otherwise to `/dashboard/home` (see `docs/design/access-and-dashboard.md`).
 
 ### Loading the dashboard
 
@@ -55,7 +55,7 @@ If step 1 fails for any reason other than `401` (network, server error, origin r
 
 ### Route protection
 
-`proxy.ts` runs Auth.js on `/dashboard/:path*` only. Without a valid Auth.js session the request is redirected to `/auth/signin?callbackUrl=…` before the page renders.
+`proxy.ts` runs Auth.js on `/dashboard/:path*` and `/onboarding` only. Without a valid Auth.js session the request is redirected to `/auth/signin?callbackUrl=…` before the page renders.
 
 This is an optimistic check on the Auth.js cookie. It does not contact the API and does not check roles. The API still decides every data request.
 
@@ -83,7 +83,7 @@ The API session has a fixed lifetime from login (`SESSION_TTL_SECONDS`, currentl
 | `lib/api/auth.ts` | Auth endpoints and the `/me` profile schema |
 | `lib/auth/session-user.ts` | The only fields allowed in the Auth.js session |
 | `auth.ts` | Auth.js configuration: credentials bridge, lifetime, `authorized` |
-| `proxy.ts` | Optimistic route protection for `/dashboard` |
+| `proxy.ts` | Optimistic route protection for `/dashboard` and `/onboarding` |
 | `components/auth/sign-in-form.tsx` | Sign-in flow |
 | `components/auth/current-actor-provider.tsx` | Loads `/me`, handles `401`, provides `useCurrentActor()` |
 | `components/auth/sign-out-button.tsx` | Sign-out flow |
@@ -91,7 +91,7 @@ The API session has a fixed lifetime from login (`SESSION_TTL_SECONDS`, currentl
 ## Known limitations
 
 - **The Auth.js session can be created without the API.** The credentials bridge cannot verify the profile it receives, so someone can create an Auth.js session with made-up details. This only reaches an empty dashboard shell: `/me` returns `401` and signs them out, and no API data is available without the `ditscf.session` cookie. Closing this fully needs a backend handoff endpoint.
-- **`callbackUrl` is ignored.** After signing in, users always land on `/dashboard/home`. Honouring it must accept same-site paths only, to avoid open redirects.
+- **`callbackUrl` is ignored.** After signing in, users always land on `/onboarding` or `/dashboard/home`. Honouring it must accept same-site paths only, to avoid open redirects.
 - **Signed-in users can open `/auth/signin`.** They are not redirected to the dashboard, because the Auth.js session may outlive the API session.
 - **No automated frontend tests.** Verification so far is manual.
 

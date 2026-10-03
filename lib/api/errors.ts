@@ -6,6 +6,7 @@ export type ApiErrorKind =
   | 'unauthenticated'
   | 'forbidden'
   | 'not_found'
+  | 'conflict'
   | 'rate_limited'
   | 'server'
   | 'network'
@@ -64,6 +65,7 @@ function classifyStatus(status: number): ApiErrorKind {
   if (status === 401) return 'unauthenticated';
   if (status === 403) return 'forbidden';
   if (status === 404) return 'not_found';
+  if (status === 409) return 'conflict';
   if (status === 429) return 'rate_limited';
   if (status >= 500) return 'server';
   return 'unknown';
