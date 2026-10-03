@@ -1,4 +1,18 @@
+import { z } from 'zod';
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const LOGIN_CODE_LENGTH = 6;
+
+export const loginEmailSchema = z
+  .string()
+  .trim()
+  .min(1, 'Enter your email address.')
+  .regex(EMAIL_PATTERN, 'Enter a valid email address, like name@example.com.');
+
+export const loginCodeSchema = z
+  .string()
+  .regex(new RegExp(`^\\d{${LOGIN_CODE_LENGTH}}$`), `Enter the ${LOGIN_CODE_LENGTH}-digit code from your email.`);
 const PHONE_CHARACTERS_PATTERN = /^\+?[\d\s-]+$/;
 const MIN_PHONE_DIGITS = 9;
 const MAX_PHONE_DIGITS = 13;

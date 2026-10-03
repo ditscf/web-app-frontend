@@ -35,7 +35,7 @@ The Vice General Secretary’s defined duty is joint membership approval with th
 
 Ministries already exist. They are not created or deleted in the first version. A member selects one or more during onboarding and cannot change that selection afterward.
 
-The Chairman appoints each Ministry Leader. A Ministry Leader may add or remove a member, including a member who did not ask to join, and may see and manage membership in other ministries.
+The Chairman appoints each Ministry Leader for one fellowship year. Leadership does not carry over to the next year. A Ministry Leader may add or remove a member, including a member who did not ask to join, and may see and manage membership in other ministries.
 
 Ministry attendance and engagement scoring are later work.
 

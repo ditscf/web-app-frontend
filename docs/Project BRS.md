@@ -25,6 +25,7 @@ The system shall:
 - Change the member to Associate only after the Chairman confirms.
 - Keep the Associate in the system.
 - Remove the Associate from ministries and events.
+- End the person's current ministry leadership and event roles. The ministry may then have no leader until the Chairman appoints one.
 - Not provide Associate sign-in in the first version.
 
 ## 3. Leadership and roles
@@ -32,10 +33,19 @@ The system shall:
 The system shall support these offices:
 
 - Chairman, Vice Chairman, General Secretary, Vice General Secretary, Treasurer.
-- Ministry Leader, one per ministry, appointed by the Chairman.
+- Ministry Leader, appointed by the Chairman for one ministry in one fellowship year.
 - Event Chairman, Event Treasurer, and Event Secretary, appointed by the Chairman for one event.
 
 While a fellowship year is OPEN, the Chairman may start the year, create events, appoint Ministry Leaders and event committees, and manage ministry membership and event records.
+
+Ministry leadership rules:
+
+- In a fellowship year, a ministry has at most one current leader, and a person leads at most one ministry.
+- The appointee must be an Active Member. They may also hold a fellowship office. They do not need to be a member of that ministry.
+- A leader changes only by replacement. The same person may be appointed again later in that year.
+- Leadership does not carry over to a new fellowship year. Earlier leadership remains as history.
+
+An office, ministry leadership, or event role counts only when it has not ended and belongs to the operative fellowship year, which is the one year that is OPEN or CLOSED. Fellowship officers are not replaced during a year in the first version.
 
 The Treasurer has no operational responsibility in the first version.
 
@@ -50,7 +60,7 @@ The system shall:
 - Use ministries that already exist. Do not create or delete ministries in the first version.
 - Let a member select one or more ministries during onboarding.
 - Prevent the member from changing ministry membership after onboarding.
-- Let a Ministry Leader add or remove a member, including a member who did not ask to join.
+- Let a Ministry Leader of the current fellowship year add or remove a member, including a member who did not ask to join, while the year is OPEN.
 - Let a Ministry Leader see and manage membership in other ministries.
 
 Ministry attendance, engagement scoring, and advanced ministry tools are out of the first version.
@@ -60,6 +70,7 @@ Ministry attendance, engagement scoring, and advanced ministry tools are out of 
 The system shall:
 
 - Let the Chairman create an event and appoint the event committee.
+- Allow a person at most one current committee role per event.
 - Treat participant and attendee as one list.
 - Allow only an Active Member or an Associate to be added.
 - While the event is ACTIVE, let the Event Chairman manage participants, venue, and event operations.
@@ -70,7 +81,7 @@ Event lifecycle:
 
 - ACTIVE: event leaders may operate the event, subject to the fellowship year being OPEN.
 - CLOSED: set by the Event Chairman. Only the Vice Chairman may correct the event.
-- ARCHIVED: set by the Vice Chairman. Nobody may change the event.
+- ARCHIVED: set by the Vice Chairman. Nobody may change the event. Its committee roles are no longer current.
 
 ## 6. Fellowship year, closure, and preservation
 
@@ -81,6 +92,9 @@ The system shall:
 - Let the General Secretary request closure.
 - Keep that request pending for 12 hours. If the Chairman does not confirm it, expire the request. Do not close the year automatically.
 - Let the Chairman move the year to CLOSED, and later to ARCHIVED.
+- Refuse to close a year while any of its events is ACTIVE.
+- Refuse to archive a year until every one of its events is ARCHIVED.
+- When an event or a year is archived, record an end date on its assignments that are still open, for history.
 
 When the year is CLOSED:
 

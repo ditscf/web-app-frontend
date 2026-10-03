@@ -453,7 +453,7 @@ The list below is the current V1 rule set. It replaces the earlier open question
 
 - Fellowship leadership: Chairman, Vice Chairman, General Secretary, Vice General Secretary, Treasurer.
 - Event leadership, separate from fellowship offices: Event Chairman, Event Treasurer, Event Secretary.
-- Ministry Leaders, appointed by the Chairman. Each ministry has its own Ministry Leader.
+- Ministry Leaders, appointed by the Chairman for one ministry in one fellowship year. See "Scoped responsibilities" below.
 - Active Member and Associate. An Associate is a graduated member who remains in the system. Members are not deleted after graduation.
 - The Treasurer has no operational responsibility in V1.
 
@@ -507,6 +507,34 @@ The list below is the current V1 rule set. It replaces the earlier open question
 - An Event Chairman marks the member as a graduation candidate and sends that request to the Chairman.
 - The member becomes an Associate only after the Chairman confirms.
 - After that, the Associate does not belong to ministries or events. The person remains in the system.
+
+**Scoped responsibilities — approved by the project owner**
+
+Ministry leadership:
+
+1. A Ministry Leader assignment belongs to exactly one ministry and one fellowship year.
+2. In a fellowship year, a ministry has at most one current leader.
+3. In a fellowship year, a person holds at most one current Ministry Leader assignment. After being replaced, the same person may be appointed again in that year.
+4. Only the Chairman appoints a Ministry Leader, and only while the year is OPEN. The appointee must be an Active Member. Holding a fellowship office as well is allowed. The appointee does not need to be a member of that ministry.
+5. Leadership changes only by replacement: the current assignment ends and the new one starts together. A leader is not removed without a replacement, except that graduation ends the leadership.
+6. Ministry leadership does not carry over to a new fellowship year. Earlier assignments remain as history.
+
+Fellowship years and offices:
+
+7. The operative fellowship year is the one year that is OPEN or CLOSED. An ARCHIVED year is never operative. The system enforces this in stored data.
+8. An office, ministry leadership, or event role is current only when it has not ended AND it belongs to the operative year. An assignment that has not ended but belongs to an earlier year is not current.
+9. Fellowship officers are not replaced during a year in V1.
+
+Events:
+
+10. An event role is current when it has not ended, the event belongs to the operative year, and the event is not ARCHIVED. The role can be exercised only while the year is OPEN and the event is ACTIVE.
+11. A person holds at most one current committee role per event.
+12. A year cannot be closed while any of its events is ACTIVE.
+13. A year cannot be archived until every one of its events is ARCHIVED.
+14. Graduation ends the person's current ministry leadership and event roles. The ministry may then have no leader until the Chairman appoints one.
+15. Archiving an event or a year records an end date on assignments that are still open, for history. Access decisions do not depend on those end dates.
+
+Rules 4, 5, and 12–15 describe workflows (appointment, replacement, year closure and archive, graduation) that are not built yet. They are recorded here so those workflows follow them.
 
 **Superseded source-document wording**
 

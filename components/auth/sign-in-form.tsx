@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { AuthCard } from '@/components/auth/auth-card';
@@ -11,13 +12,42 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputOTP } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
+import { getCurrentActor, requestLoginCode, verifyLoginCode } from '@/lib/api/auth';
+import { getUserFacingMessage, isApiError, toApiError } from '@/lib/api/errors';
+import { toSessionUser } from '@/lib/auth/session-user';
 import { cn } from '@/lib/utils';
-import { isValidEmail } from '@/lib/validation';
+import { LOGIN_CODE_LENGTH, loginCodeSchema, loginEmailSchema } from '@/lib/validation';
 
-const CODE_LENGTH = 6;
 const CODE_INPUT_ID = 'verification-code';
+const AFTER_SIGN_IN_PATH = '/dashboard/home';
+const SESSION_NOT_KEPT_MESSAGE =
+  "Your browser didn't keep the sign-in session. Allow cookies for this site and try again.";
+const FRONTEND_SESSION_ERROR_MESSAGE = "We couldn't finish signing you in. Please try again.";
 
 type SignInStep = 'email' | 'code';
+
+async function completeSignIn(email: string, code: string): Promise<string | null> {
+  try {
+    await verifyLoginCode(email, code);
+  } catch (error) {
+    return getUserFacingMessage(error);
+  }
+
+  let actor;
+  try {
+    actor = await getCurrentActor();
+  } catch (error) {
+    if (isApiError(error) && error.kind === 'unauthenticated') return SESSION_NOT_KEPT_MESSAGE;
+    return getUserFacingMessage(error);
+  }
+
+  try {
+    const result = await signIn('credentials', { ...toSessionUser(actor), redirect: false });
+    return result.ok && !result.error ? null : FRONTEND_SESSION_ERROR_MESSAGE;
+  } catch {
+    return FRONTEND_SESSION_ERROR_MESSAGE;
+  }
+}
 
 export function SignInForm() {
   const router = useRouter();
@@ -25,8 +55,10 @@ export function SignInForm() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [isRequestingCode, setIsRequestingCode] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
-  const canVerify = code.length === CODE_LENGTH && !isSigningIn;
+  const canVerify = loginCodeSchema.safeParse(code).success && !isSigningIn;
 
   useEffect(() => {
     if (step === 'code') document.getElementById(CODE_INPUT_ID)?.focus();
@@ -37,42 +69,78 @@ export function SignInForm() {
     if (emailError) setEmailError(null);
   }
 
-  function handleEmailSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const trimmedEmail = email.trim();
-
-    if (!trimmedEmail) {
-      setEmailError('Enter your email address.');
-      return;
-    }
-
-    if (!isValidEmail(trimmedEmail)) {
-      setEmailError('Enter a valid email address, like name@example.com.');
-      return;
-    }
-
-    setEmail(trimmedEmail);
-    setCode('');
-    setStep('code');
+  function handleCodeChange(value: string) {
+    setCode(value);
+    if (codeError) setCodeError(null);
   }
 
-  function handleCodeSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleEmailSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (isRequestingCode) return;
+
+    const parsedEmail = loginEmailSchema.safeParse(email);
+    if (!parsedEmail.success) {
+      setEmailError(parsedEmail.error.issues[0]?.message ?? 'Enter a valid email address.');
+      return;
+    }
+
+    setIsRequestingCode(true);
+    try {
+      await requestLoginCode(parsedEmail.data);
+      setEmail(parsedEmail.data);
+      setCode('');
+      setCodeError(null);
+      setStep('code');
+    } catch (error) {
+      if (toApiError(error).kind === 'validation') {
+        setEmailError(getUserFacingMessage(error));
+      } else {
+        toast.error("We couldn't send your code", { description: getUserFacingMessage(error) });
+      }
+    } finally {
+      setIsRequestingCode(false);
+    }
+  }
+
+  async function handleCodeSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canVerify) return;
 
     setIsSigningIn(true);
+    setCodeError(null);
+    const errorMessage = await completeSignIn(email, code);
+    if (errorMessage) {
+      setCodeError(errorMessage);
+      setIsSigningIn(false);
+      return;
+    }
+
     toast.success('Signed in successfully', { description: 'Welcome back to DITSCF.' });
-    router.push('/dashboard/home');
+    router.replace(AFTER_SIGN_IN_PATH);
   }
 
-  function handleResendCode() {
+  async function handleResendCode() {
+    if (isRequestingCode) return;
+
+    setIsRequestingCode(true);
     setCode('');
-    toast.info('A new code is on its way', { description: `Check ${email} for a fresh 6-digit code.` });
-    document.getElementById(CODE_INPUT_ID)?.focus();
+    setCodeError(null);
+    try {
+      await requestLoginCode(email);
+      toast.info('A new code is on its way', {
+        description: `Check ${email} for a fresh ${LOGIN_CODE_LENGTH}-digit code.`,
+      });
+    } catch (error) {
+      toast.error("We couldn't send a new code", { description: getUserFacingMessage(error) });
+    } finally {
+      setIsRequestingCode(false);
+      document.getElementById(CODE_INPUT_ID)?.focus();
+    }
   }
 
   function handleChangeEmail() {
     setCode('');
+    setCodeError(null);
     setStep('email');
   }
 
@@ -116,8 +184,8 @@ export function SignInForm() {
                 </p>
               ) : null}
             </div>
-            <Button type="submit" size="lg" className="w-full">
-              Continue <ArrowRight size={18} />
+            <Button type="submit" size="lg" className="w-full" disabled={isRequestingCode}>
+              {isRequestingCode ? 'Sending code...' : 'Continue'} <ArrowRight size={18} />
             </Button>
           </form>
           <p className="mt-6 text-center text-sm text-slate-600">
@@ -141,10 +209,20 @@ export function SignInForm() {
           <form onSubmit={handleCodeSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor={CODE_INPUT_ID}>Verification code</Label>
-              <InputOTP id={CODE_INPUT_ID} length={CODE_LENGTH} value={code} onValueChange={setCode} />
+              <InputOTP
+                id={CODE_INPUT_ID}
+                length={LOGIN_CODE_LENGTH}
+                value={code}
+                onValueChange={handleCodeChange}
+              />
+              {codeError ? (
+                <p id="code-error" role="alert" className="text-sm font-semibold text-red-600">
+                  {codeError}
+                </p>
+              ) : null}
             </div>
             <Button type="submit" size="lg" className="w-full" disabled={!canVerify}>
-              Verify and sign in <ArrowRight size={18} />
+              {isSigningIn ? 'Signing in...' : 'Verify and sign in'} <ArrowRight size={18} />
             </Button>
           </form>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm">
@@ -156,7 +234,8 @@ export function SignInForm() {
               <button
                 type="button"
                 onClick={handleResendCode}
-                className="rounded-full font-bold text-royal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                disabled={isRequestingCode || isSigningIn}
+                className="rounded-full disabled:opacity-50 font-bold text-royal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
               >
                 Resend code
               </button>
