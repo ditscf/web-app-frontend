@@ -7,7 +7,7 @@ Technical design for how the DITSCF-MS frontend decides what each member sees. B
 - **The backend decides every action.** Frontend rules only decide what to show. A hidden link or button is a convenience, not security.
 - **One source for visibility.** All rules live in `lib/auth/access.ts`. They read the profile from `GET /v1/auth/me` (offices, ministry leadership, event roles, operative year). The API does not send permission flags.
 - **No roles in the Auth.js session or `proxy.ts`.** The proxy only checks that a session exists. Responsibilities are loaded from `/me` on each dashboard load, so a change on the API applies on the next load.
-- **Routes are organised by resource, not by role.** For example `/dashboard/applications`, later `/dashboard/ministries/[id]`. There is no role switcher: a member who holds several responsibilities sees all of their links.
+- **Routes are organised by resource, not by role.** For example `/dashboard/applications` and `/dashboard/ministries/[ministryId]`. There is no role switcher: a member who holds several responsibilities sees all of their links.
 
 ## Visibility rules
 
@@ -16,12 +16,24 @@ Technical design for how the DITSCF-MS frontend decides what each member sees. B
 | `isOnboardingRequired(actor)` | The API's onboarding requirement on member routes | Onboarding gate, sign-in redirect |
 | `getApprovalStep(actor)` | `member.approveAsGs`, `member.approveAsVgs` | Which approve button the queue shows; home counts |
 | `canReviewApplications(actor)` | `member.reviewApplications`, plus onboarding | Applications nav link and page; home counts |
+| `canManageOwnProfile(actor)` | `member.viewOwn`, `member.editOwnProfile`: an Active Member | My profile |
+| `canViewMinistryLeaders(actor)` | No policy action; the API only requires onboarding | Ministries nav link and page |
+| `canAppointMinistryLeaders(actor)` | `ministry.appointLeader`: the Chairman, year OPEN | Appoint or replace leaders; home count of ministries without a leader |
+| `canManageMinistryMembers(actor, ministryId)` | `ministry.manageMembership`: the Chairman, or that ministry's leader, year OPEN | Add or remove ministry members |
+| `canOverseeMinistryMembers(actor, ministryId)` | `ministry.viewMembership`: the Chairman, or that ministry's leader, year OPEN or CLOSED | Link to a ministry's member list; closed-year note |
+
+Every rule also requires completed onboarding, because the API requires it on those routes.
 
 Notes:
 
 - `/me` returns no responsibilities when there is no operative year (the holiday). The rules therefore check that `operativeYear` is present and do not repeat the year-status rule: OPEN and CLOSED are the only statuses `/me` returns, and both allow application review.
 - A member who holds the General Secretary office is treated as the General Secretary step. The backend prevents one person from recording both steps.
+- `ministry.viewMembership` also allows current members of the ministry being viewed. `/auth/me` does not list a member's ministries, so the frontend shows no link for that case; a direct visit still works because the API decides.
 - When a backend policy action changes, update the matching rule and this table together.
+
+## Keeping the profile current
+
+`CurrentActorProvider` loads `/auth/me` once per layout. After an in-dashboard action that changes what `/auth/me` returns (a name or email change, or the Chairman appointing themselves as a leader), call the function from `useRefreshCurrentActor()`. It reloads `/auth/me` while the current profile stays on screen. It rejects with the API error, so the caller decides what to show; a `401` still signs the member out through the global handler.
 
 ## When access is refused
 
@@ -44,15 +56,22 @@ Members must finish onboarding before using member pages. The API enforces this;
 
 `components/dashboard/home-overview.tsx` shows the welcome, "Needs your attention", the fellowship year, and the member's responsibilities.
 
-"Needs your attention" (`components/dashboard/needs-attention.tsx`):
+"Needs your attention" (`components/dashboard/needs-attention.tsx`) has two independent counts. Each is requested only by members its rule allows, and one failing does not hide the other.
 
-- Appears only for members with `canReviewApplications`. Other members never trigger the request.
+Pending applications, for members with `canReviewApplications`:
+
 - Counts pending applications from `GET /v1/applications/list`, split by who they are waiting for:
   - waiting for the General Secretary: the General Secretary step is not recorded;
   - waiting for the Vice General Secretary: the General Secretary step is recorded.
 - Each officer sees both counts, worded from their side ("waiting for your approval" and "waiting for the …"), so either can remind the other. The approval order is unchanged.
 - The list endpoint returns at most 100 (`PENDING_APPLICATIONS_LIMIT`). At that limit the counts show a `+`.
-- Items with a zero count are hidden, and the whole section is hidden when it has no items or the request fails. The home page never shows an error for it.
+
+Ministries without a leader, for `canAppointMinistryLeaders` (the Chairman while the year is OPEN):
+
+- "N ministries have no leader this year", counted from `GET /v1/ministries/leaders`, linking to `/dashboard/ministries`.
+- Counted only when the response's operative year is OPEN, because leaders can only be appointed then.
+
+Items with a zero count are hidden, as is an item whose request fails. The whole section is hidden when it has no items. The home page never shows an error for it.
 
 ## Adding a module
 
@@ -75,12 +94,16 @@ Members must finish onboarding before using member pages. The API enforces this;
 | `components/applications/applications-review.tsx` | Applications queue and step-aware approval |
 | `components/onboarding/require-onboarding-complete.tsx` | Dashboard onboarding gate |
 | `components/onboarding/onboarding-form.tsx` | Ministry selection and onboarding submission |
+| `components/auth/current-actor-provider.tsx` | Loads `/auth/me`; `useCurrentActor()` and `useRefreshCurrentActor()` |
+| `components/profile/` | My profile and email change (`docs/design/profile.md`) |
+| `components/ministries/` | Ministries, leaders, and members (`docs/design/ministries.md`) |
 | `lib/api/applications.ts` | Sign-up, pending list, approval |
-| `lib/api/ministries.ts` | Ministry list |
+| `lib/api/ministries.ts` | Ministry list, leaders, appointment, members |
 | `lib/api/onboarding.ts` | Onboarding submission |
+| `lib/api/profile.ts` | Own profile, edit, email change |
 
 ## Known limitations
 
 - **Visibility can lag the API by one load.** The profile is loaded when a layout mounts. If an office changes while a member is signed in, links update on the next load; the API refuses any action in the meantime.
 - **Home counts can be stale.** They are loaded once per home visit, not refreshed live.
-- **Most modules are not built yet.** Member pages, ministries, events, fellowship year closure, and graduation wait for their backend endpoints.
+- **Some modules are not built yet.** Events, fellowship year closure, graduation, and member access views (my ministries, my events, past years) wait for their backend endpoints (see `docs/roadmap.md`).

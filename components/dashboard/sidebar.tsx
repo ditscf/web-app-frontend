@@ -1,6 +1,6 @@
 'use client';
 
-import { ClipboardCheck, House, Menu, X, type LucideIcon } from 'lucide-react';
+import { ClipboardCheck, House, Menu, UserRound, UsersRound, X, type LucideIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -9,7 +9,7 @@ import { useCurrentActor } from '@/components/auth/current-actor-provider';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import { Button } from '@/components/ui/button';
 import type { ActorProfile } from '@/lib/api/auth';
-import { canReviewApplications } from '@/lib/auth/access';
+import { canManageOwnProfile, canReviewApplications, canViewMinistryLeaders } from '@/lib/auth/access';
 import { YEAR_STATUS_LABELS } from '@/lib/auth/responsibility-labels';
 import { ditscfLogoImage } from '@/lib/site-content';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,9 @@ type NavTone = 'dark' | 'light';
 
 const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/home', label: 'Home', icon: House, isVisible: () => true },
+  { href: '/dashboard/ministries', label: 'Ministries', icon: UsersRound, isVisible: canViewMinistryLeaders },
   { href: '/dashboard/applications', label: 'Applications', icon: ClipboardCheck, isVisible: canReviewApplications },
+  { href: '/dashboard/profile', label: 'My profile', icon: UserRound, isVisible: canManageOwnProfile },
 ];
 
 const MOBILE_NAV_ID = 'dashboard-mobile-nav';
@@ -59,7 +61,7 @@ function DashboardNavLinks({ tone, onNavigate }: { tone: NavTone; onNavigate?: (
               aria-current={isActive ? 'page' : undefined}
               onClick={onNavigate}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold',
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gold',
                 tone === 'dark'
                   ? isActive
                     ? 'bg-white/10 text-white'

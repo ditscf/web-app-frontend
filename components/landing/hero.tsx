@@ -29,14 +29,14 @@ export function Hero() {
             />
           ))}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/82 to-royal/30" />
+        <div className="absolute inset-0 bg-linear-to-r from-navy via-navy/82 to-royal/30" />
         <div className="absolute inset-0 bg-royal-radial" />
       </div>
 
       <div className="section-shell relative flex min-h-screen items-center pt-28">
         <div className="grid w-full items-end gap-12 lg:grid-cols-[1fr_390px]">
           <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.8 }}>
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
               <Sparkles size={16} className="text-gold" />
               Dar es Salaam Institute of Technology
             </div>
@@ -44,7 +44,7 @@ export function Hero() {
               One Family For Gospel.
             </h1>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Button asChild variant="gold" size="lg">
+              <Button asChild size="lg">
                 <Link href="/auth/signin">
                   Join Fellowship <ArrowRight size={18} />
                 </Link>
@@ -59,15 +59,15 @@ export function Hero() {
           </motion.div>
 
           <motion.div
-            className="glass rounded-[2rem] p-5 text-navy shadow-premium"
+            className="glass rounded-4xl p-5 text-navy shadow-premium"
             initial={{ opacity: 0, y: 34 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.35 }}
           >
-            <div className="rounded-[1.5rem] bg-white p-5">
+            <div className="rounded-3xl bg-white p-5">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-black uppercase tracking-[0.18em] text-royal">Live Impact</span>
-                <Badge variant="soft">2026</Badge>
+                <Badge variant="secondary">2026</Badge>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3">
                 {heroStats.map((stat) => (

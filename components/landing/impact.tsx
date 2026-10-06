@@ -15,7 +15,7 @@ export function Impact() {
       />
       <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {impactStats.map((stat) => (
-          <Card key={stat.label} className="rounded-[2rem] p-8 text-center">
+          <Card key={stat.label} className="rounded-4xl p-8 text-center">
             <strong className="block text-5xl font-black text-royal">
               <AnimatedNumber value={stat.value} />
             </strong>

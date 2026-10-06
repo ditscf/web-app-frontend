@@ -94,8 +94,6 @@ const NAME_MAX_LENGTH = 80;
 const PHONE_MAX_LENGTH = 32;
 
 const INPUT_CLASS = 'placeholder:font-semibold placeholder:text-slate-400';
-const INPUT_ERROR_CLASS = 'border-red-500 focus:border-red-500';
-const SELECT_ERROR_CLASS = 'border-red-500 focus-visible:border-red-500 data-[popup-open]:border-red-500';
 
 function getTodayIsoDate(): string {
   const now = new Date();
@@ -170,8 +168,7 @@ export function SignUpForm() {
     if (errors[field]) setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  function handleStudyClassChange(value: string | null) {
-    const studyClass = value ?? '';
+  function handleStudyClassChange(studyClass: string) {
     setData((current) => ({
       ...current,
       studyClass,
@@ -327,14 +324,13 @@ export function SignUpForm() {
               <>
                 <FormField id="studyClass" label="Class" error={errors.studyClass}>
                   <Select
-                    id="studyClass"
                     name="studyClass"
-                    value={data.studyClass || null}
+                    value={data.studyClass}
                     onValueChange={handleStudyClassChange}
                   >
                     <SelectTrigger
+                      id="studyClass"
                       {...getErrorProps('studyClass', errors.studyClass)}
-                      className={cn(errors.studyClass && SELECT_ERROR_CLASS)}
                     >
                       <SelectValue placeholder="Choose your class" />
                     </SelectTrigger>
@@ -349,15 +345,14 @@ export function SignUpForm() {
                 </FormField>
                 <FormField id="course" label="Course" error={errors.course}>
                   <Select
-                    id="course"
                     name="course"
-                    value={data.course || null}
-                    onValueChange={(value) => updateField('course', value ?? '')}
+                    value={data.course}
+                    onValueChange={(value) => updateField('course', value)}
                     disabled={!data.studyClass}
                   >
                     <SelectTrigger
+                      id="course"
                       {...getErrorProps('course', errors.course)}
-                      className={cn(errors.course && SELECT_ERROR_CLASS)}
                     >
                       <SelectValue placeholder={data.studyClass ? 'Choose your course' : 'Choose your class first'} />
                     </SelectTrigger>
@@ -372,14 +367,13 @@ export function SignUpForm() {
                 </FormField>
                 <FormField id="yearOfStudy" label="Year of study" error={errors.yearOfStudy}>
                   <Select
-                    id="yearOfStudy"
                     name="yearOfStudy"
-                    value={data.yearOfStudy || null}
-                    onValueChange={(value) => updateField('yearOfStudy', value ?? '')}
+                    value={data.yearOfStudy}
+                    onValueChange={(value) => updateField('yearOfStudy', value)}
                   >
                     <SelectTrigger
+                      id="yearOfStudy"
                       {...getErrorProps('yearOfStudy', errors.yearOfStudy)}
-                      className={cn(errors.yearOfStudy && SELECT_ERROR_CLASS)}
                     >
                       <SelectValue placeholder="Choose an academic year" />
                     </SelectTrigger>
@@ -526,7 +520,7 @@ function TextField({
         id={field}
         name={field}
         {...getErrorProps(field, error)}
-        className={cn(INPUT_CLASS, error && INPUT_ERROR_CLASS, className)}
+        className={cn(INPUT_CLASS, className)}
         {...props}
       />
     </FormField>
@@ -579,7 +573,7 @@ function ReviewItem({
   return (
     <div className={className}>
       <dt className="text-xs font-semibold text-slate-500">{label}</dt>
-      <dd className={cn('mt-0.5 break-words font-bold text-navy', valueClassName)}>{value}</dd>
+      <dd className={cn('mt-0.5 wrap-break-word font-bold text-navy', valueClassName)}>{value}</dd>
     </div>
   );
 }

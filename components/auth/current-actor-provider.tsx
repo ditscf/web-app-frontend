@@ -13,12 +13,29 @@ type ActorState =
   | { status: 'authenticated'; actor: ActorProfile }
   | { status: 'error'; message: string };
 
-const CurrentActorContext = createContext<ActorProfile | null>(null);
+interface CurrentActorContextValue {
+  actor: ActorProfile;
+  refresh: () => Promise<void>;
+}
+
+const CurrentActorContext = createContext<CurrentActorContextValue | null>(null);
+
+function useCurrentActorContext(): CurrentActorContextValue {
+  const context = useContext(CurrentActorContext);
+  if (!context) throw new Error('useCurrentActor must be used inside CurrentActorProvider.');
+  return context;
+}
 
 export function useCurrentActor(): ActorProfile {
-  const actor = useContext(CurrentActorContext);
-  if (!actor) throw new Error('useCurrentActor must be used inside CurrentActorProvider.');
-  return actor;
+  return useCurrentActorContext().actor;
+}
+
+/**
+ * Reloads `/auth/me` after an in-dashboard change that affects it, keeping the current profile on screen
+ * meanwhile. Rejects with the API error so the caller decides what to show; a `401` still signs out.
+ */
+export function useRefreshCurrentActor(): () => Promise<void> {
+  return useCurrentActorContext().refresh;
 }
 
 export function CurrentActorProvider({ children }: { children: ReactNode }) {
@@ -59,6 +76,11 @@ export function CurrentActorProvider({ children }: { children: ReactNode }) {
     setLoadAttempt((attempt) => attempt + 1);
   }
 
+  async function refresh() {
+    const actor = await getCurrentActor();
+    setState({ status: 'authenticated', actor });
+  }
+
   if (state.status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
@@ -83,7 +105,7 @@ export function CurrentActorProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  return <CurrentActorContext.Provider value={state.actor}>
+  return <CurrentActorContext.Provider value={{ actor: state.actor, refresh }}>
     {children}
   </CurrentActorContext.Provider>;
 }

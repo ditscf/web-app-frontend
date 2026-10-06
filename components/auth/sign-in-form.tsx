@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { AuthCard } from '@/components/auth/auth-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { InputOTP } from '@/components/ui/input-otp';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
 import { DASHBOARD_HOME_PATH, ONBOARDING_PATH } from '@/constants/constant';
 import { getCurrentActor, requestLoginCode, verifyLoginCode, type ActorProfile } from '@/lib/api/auth';
@@ -215,12 +215,13 @@ export function SignInForm() {
           <form onSubmit={handleCodeSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor={CODE_INPUT_ID}>Verification code</Label>
-              <InputOTP
-                id={CODE_INPUT_ID}
-                length={LOGIN_CODE_LENGTH}
-                value={code}
-                onValueChange={handleCodeChange}
-              />
+              <InputOTP id={CODE_INPUT_ID} maxLength={LOGIN_CODE_LENGTH} value={code} onChange={handleCodeChange}>
+                <InputOTPGroup>
+                  {Array.from({ length: LOGIN_CODE_LENGTH }, (_, index) => (
+                    <InputOTPSlot key={index} index={index} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
               {codeError ? (
                 <p id="code-error" role="alert" className="text-sm font-semibold text-red-600">
                   {codeError}
@@ -241,7 +242,7 @@ export function SignInForm() {
                 type="button"
                 onClick={handleResendCode}
                 disabled={isRequestingCode || isSigningIn}
-                className="rounded-full disabled:opacity-50 font-bold text-royal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                className="rounded-full disabled:opacity-50 font-bold text-royal hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gold"
               >
                 Resend code
               </button>

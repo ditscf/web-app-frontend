@@ -15,7 +15,7 @@ export function Leadership() {
       />
       <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
         {leaders.map((leader) => (
-          <Card key={leader.role} className="overflow-hidden rounded-[2rem] text-center">
+          <Card key={leader.role} className="overflow-hidden rounded-4xl text-center">
             <div className="relative h-44">
               <Image
                 src={leader.image}

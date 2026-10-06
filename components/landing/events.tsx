@@ -21,7 +21,7 @@ export function Events() {
           text="From worship nights to outreach missions, DITSCF programs are designed to form believers and impact communities."
         />
         <div className="mt-14 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] shadow-premium">
+          <div className="relative min-h-[520px] overflow-hidden rounded-4xl shadow-premium">
             <Image
               src={featuredEvent.image}
               alt=""
@@ -29,12 +29,12 @@ export function Events() {
               sizes="(min-width: 1024px) 640px, 100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/42 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-navy via-navy/42 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-8">
-              <Badge variant="gold">Featured Event</Badge>
+              <Badge>Featured Event</Badge>
               <h3 className="mt-5 text-4xl font-black">{featuredEvent.title}</h3>
               <p className="mt-4 max-w-xl leading-7 text-white/72">{featuredEvent.description}</p>
-              <Button className="mt-7" variant="gold">
+              <Button className="mt-7">
                 Reserve Seat <CalendarDays size={18} />
               </Button>
             </div>
@@ -43,7 +43,7 @@ export function Events() {
             {events.map((event, index) => (
               <motion.div
                 key={event}
-                className="flex items-center justify-between rounded-[1.5rem] border border-white/10 bg-white/8 p-5 backdrop-blur"
+                className="flex items-center justify-between rounded-3xl border border-white/10 bg-white/8 p-5 backdrop-blur-sm"
                 initial={{ opacity: 0, x: 24 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}

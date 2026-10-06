@@ -14,7 +14,9 @@ The system shall:
 - Generate a Fellowship ID when approval is complete, and set the person to Active Member.
 - Expire a Pending application 48 hours after submission if approval is not complete. The person must register again.
 - Allow registration and approval while a fellowship year is OPEN or CLOSED.
-- Allow only the member to change their own profile fields after approval.
+- Allow only the member to change their own profile fields after approval, except date of birth.
+- Apply a change of email only after the member confirms a code sent to the new address.
+- Keep date of birth fixed after registration, visible to the member only.
 - Keep membership history. Do not delete the person.
 
 ## 2. Graduation and Associate status
@@ -41,7 +43,7 @@ While a fellowship year is OPEN, the Chairman may start the year, create events,
 Ministry leadership rules:
 
 - In a fellowship year, a ministry has at most one current leader, and a person leads at most one ministry.
-- The appointee must be an Active Member. They may also hold a fellowship office. They do not need to be a member of that ministry.
+- The appointee must be an Active Member. They may also hold a fellowship office. Appointment makes them a member of that ministry if they are not one already.
 - A leader changes only by replacement. The same person may be appointed again later in that year.
 - Leadership does not carry over to a new fellowship year. Earlier leadership remains as history.
 
@@ -61,7 +63,7 @@ The system shall:
 - Let a member select one or more ministries during onboarding.
 - Prevent the member from changing ministry membership after onboarding.
 - Let a Ministry Leader of the current fellowship year add or remove a member, including a member who did not ask to join, while the year is OPEN.
-- Let a Ministry Leader see and manage membership in other ministries.
+- Let a Ministry Leader see and manage membership only in the ministry they lead. The Chairman sees and manages membership in every ministry.
 
 Ministry attendance, engagement scoring, and advanced ministry tools are out of the first version.
 

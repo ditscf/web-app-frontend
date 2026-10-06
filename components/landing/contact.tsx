@@ -34,7 +34,7 @@ export function Contact() {
             {socialLinks.map((link) => {
               const Icon = link.icon;
               return (
-                <Button key={link.label} variant="light" size="icon" type="button" aria-label={link.label}>
+                <Button key={link.label} variant="secondary" size="icon" type="button" aria-label={link.label}>
                   <Icon size={18} />
                 </Button>
               );
@@ -42,7 +42,7 @@ export function Contact() {
           </div>
         </div>
       </div>
-      <Card className="rounded-[2rem] p-5 md:p-7">
+      <Card className="rounded-4xl p-5 md:p-7">
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 md:grid-cols-2">
             {contactFields.map((field) => (
@@ -60,7 +60,7 @@ export function Contact() {
             <Button variant="default" size="lg" type="submit">
               Submit Contact Form <Send size={18} />
             </Button>
-            <Button variant="gold" size="lg" type="button">
+            <Button size="lg" type="button">
               Send Prayer Request <MessageCircleHeart size={18} />
             </Button>
           </div>
