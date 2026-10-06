@@ -42,5 +42,6 @@ next-env.d.ts
 # eslint
 .eslintcache
 
-# cursor
-.cursor/
+# Ignore everything in .cursor except rules
+.cursor/*
+!.cursor/rules/
