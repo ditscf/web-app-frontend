@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { registerApplication } from '@/lib/api/applications';
+import { getUserFacingMessage, toApiError } from '@/lib/api/errors';
 import { getCoursesForStudyClass, studyClasses, yearsOfStudy } from '@/lib/onboarding-options';
 import { cn } from '@/lib/utils';
 import { isValidEmail, isValidPhone } from '@/lib/validation';
@@ -87,9 +89,11 @@ const INITIAL_DATA: SignUpData = {
   yearOfStudy: '',
 };
 
+// Match the API's length limits for these fields.
+const NAME_MAX_LENGTH = 80;
+const PHONE_MAX_LENGTH = 32;
+
 const INPUT_CLASS = 'placeholder:font-semibold placeholder:text-slate-400';
-const INPUT_ERROR_CLASS = 'border-red-500 focus:border-red-500';
-const SELECT_ERROR_CLASS = 'border-red-500 focus-visible:border-red-500 data-[popup-open]:border-red-500';
 
 function getTodayIsoDate(): string {
   const now = new Date();
@@ -148,7 +152,9 @@ export function SignUpForm() {
   const [data, setData] = useState<SignUpData>(INITIAL_DATA);
   const [errors, setErrors] = useState<SignUpErrors>({});
   const [isReturningToReview, setIsReturningToReview] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const isLocked = isSubmitting || isSubmitted;
   const step = STEPS[stepIndex];
   const isReviewStep = step.id === 'review';
   const courses = getCoursesForStudyClass(data.studyClass);
@@ -162,8 +168,7 @@ export function SignUpForm() {
     if (errors[field]) setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  function handleStudyClassChange(value: string | null) {
-    const studyClass = value ?? '';
+  function handleStudyClassChange(studyClass: string) {
     setData((current) => ({
       ...current,
       studyClass,
@@ -187,8 +192,20 @@ export function SignUpForm() {
     goToStep(STEPS.findIndex((candidate) => candidate.id === stepId));
   }
 
-  function submitApplication() {
-    if (isSubmitted) return;
+  async function submitApplication() {
+    if (isLocked) return;
+
+    setIsSubmitting(true);
+    try {
+      await registerApplication(data);
+    } catch (error) {
+      const apiError = toApiError(error);
+      const description = apiError.kind === 'validation' ? apiError.messages.join(' ') : getUserFacingMessage(error);
+      toast.error("We couldn't submit your application", { description });
+      return;
+    } finally {
+      setIsSubmitting(false);
+    }
 
     setIsSubmitted(true);
     toast.success('Application received', {
@@ -200,7 +217,7 @@ export function SignUpForm() {
     event.preventDefault();
 
     if (isReviewStep) {
-      submitApplication();
+      void submitApplication();
       return;
     }
 
@@ -246,6 +263,7 @@ export function SignUpForm() {
                     label="First name"
                     error={errors.firstName}
                     autoComplete="given-name"
+                    maxLength={NAME_MAX_LENGTH}
                     placeholder="Johnson"
                     value={data.firstName}
                     onChange={(event) => updateField('firstName', event.target.value)}
@@ -255,6 +273,7 @@ export function SignUpForm() {
                     label="Last name"
                     error={errors.lastName}
                     autoComplete="family-name"
+                    maxLength={NAME_MAX_LENGTH}
                     placeholder="Rutabangwa"
                     value={data.lastName}
                     onChange={(event) => updateField('lastName', event.target.value)}
@@ -293,6 +312,7 @@ export function SignUpForm() {
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
+                  maxLength={PHONE_MAX_LENGTH}
                   placeholder="+255 745 123 607"
                   value={data.phone}
                   onChange={(event) => updateField('phone', event.target.value)}
@@ -304,14 +324,13 @@ export function SignUpForm() {
               <>
                 <FormField id="studyClass" label="Class" error={errors.studyClass}>
                   <Select
-                    id="studyClass"
                     name="studyClass"
-                    value={data.studyClass || null}
+                    value={data.studyClass}
                     onValueChange={handleStudyClassChange}
                   >
                     <SelectTrigger
+                      id="studyClass"
                       {...getErrorProps('studyClass', errors.studyClass)}
-                      className={cn(errors.studyClass && SELECT_ERROR_CLASS)}
                     >
                       <SelectValue placeholder="Choose your class" />
                     </SelectTrigger>
@@ -326,15 +345,14 @@ export function SignUpForm() {
                 </FormField>
                 <FormField id="course" label="Course" error={errors.course}>
                   <Select
-                    id="course"
                     name="course"
-                    value={data.course || null}
-                    onValueChange={(value) => updateField('course', value ?? '')}
+                    value={data.course}
+                    onValueChange={(value) => updateField('course', value)}
                     disabled={!data.studyClass}
                   >
                     <SelectTrigger
+                      id="course"
                       {...getErrorProps('course', errors.course)}
-                      className={cn(errors.course && SELECT_ERROR_CLASS)}
                     >
                       <SelectValue placeholder={data.studyClass ? 'Choose your course' : 'Choose your class first'} />
                     </SelectTrigger>
@@ -349,14 +367,13 @@ export function SignUpForm() {
                 </FormField>
                 <FormField id="yearOfStudy" label="Year of study" error={errors.yearOfStudy}>
                   <Select
-                    id="yearOfStudy"
                     name="yearOfStudy"
-                    value={data.yearOfStudy || null}
-                    onValueChange={(value) => updateField('yearOfStudy', value ?? '')}
+                    value={data.yearOfStudy}
+                    onValueChange={(value) => updateField('yearOfStudy', value)}
                   >
                     <SelectTrigger
+                      id="yearOfStudy"
                       {...getErrorProps('yearOfStudy', errors.yearOfStudy)}
-                      className={cn(errors.yearOfStudy && SELECT_ERROR_CLASS)}
                     >
                       <SelectValue placeholder="Choose an academic year" />
                     </SelectTrigger>
@@ -374,16 +391,16 @@ export function SignUpForm() {
 
             {isReviewStep ? (
               <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200">
-                <ReviewSection title="Basic information" isEditDisabled={isSubmitted} onEdit={() => handleEditStep('basic')}>
+                <ReviewSection title="Basic information" isEditDisabled={isLocked} onEdit={() => handleEditStep('basic')}>
                   <ReviewItem label="First name" value={data.firstName} />
                   <ReviewItem label="Last name" value={data.lastName} />
                   <ReviewItem label="Date of birth" value={formatDate(data.dateOfBirth)} />
                 </ReviewSection>
-                <ReviewSection title="Contact details" isEditDisabled={isSubmitted} onEdit={() => handleEditStep('contact')}>
+                <ReviewSection title="Contact details" isEditDisabled={isLocked} onEdit={() => handleEditStep('contact')}>
                   <ReviewItem label="Email address" value={data.email} className="sm:col-span-2" valueClassName="break-all" />
                   <ReviewItem label="Phone number" value={data.phone} />
                 </ReviewSection>
-                <ReviewSection title="Education" isEditDisabled={isSubmitted} onEdit={() => handleEditStep('education')}>
+                <ReviewSection title="Education" isEditDisabled={isLocked} onEdit={() => handleEditStep('education')}>
                   <ReviewItem label="Class" value={data.studyClass} />
                   <ReviewItem label="Year of study" value={data.yearOfStudy} />
                   <ReviewItem label="Course" value={data.course} className="sm:col-span-2" />
@@ -393,16 +410,18 @@ export function SignUpForm() {
 
             <div className="flex items-center gap-3 pt-1">
               {stepIndex > 0 ? (
-                <Button type="button" variant="ghost" size="lg" onClick={handleBack} disabled={isSubmitted}>
+                <Button type="button" variant="ghost" size="lg" onClick={handleBack} disabled={isLocked}>
                   <ArrowLeft size={18} /> Back
                 </Button>
               ) : null}
-              <Button type="submit" size="lg" className="flex-1" disabled={isSubmitted}>
+              <Button type="submit" size="lg" className="flex-1" disabled={isLocked}>
                 {isReviewStep ? (
                   isSubmitted ? (
                     <>
                       Application submitted <Check size={18} />
                     </>
+                  ) : isSubmitting ? (
+                    'Submitting...'
                   ) : (
                     <>
                       Submit application <ArrowRight size={18} />
@@ -501,7 +520,7 @@ function TextField({
         id={field}
         name={field}
         {...getErrorProps(field, error)}
-        className={cn(INPUT_CLASS, error && INPUT_ERROR_CLASS, className)}
+        className={cn(INPUT_CLASS, className)}
         {...props}
       />
     </FormField>
@@ -554,7 +573,7 @@ function ReviewItem({
   return (
     <div className={className}>
       <dt className="text-xs font-semibold text-slate-500">{label}</dt>
-      <dd className={cn('mt-0.5 break-words font-bold text-navy', valueClassName)}>{value}</dd>
+      <dd className={cn('mt-0.5 wrap-break-word font-bold text-navy', valueClassName)}>{value}</dd>
     </div>
   );
 }

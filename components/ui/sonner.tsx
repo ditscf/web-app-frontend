@@ -1,43 +1,49 @@
-'use client';
+"use client"
 
-import * as React from 'react';
-import { CircleAlert, CircleCheck, Info, LoaderCircle, TriangleAlert } from 'lucide-react';
-import { Toaster as Sonner, type ToasterProps } from 'sonner';
+import { useTheme } from "next-themes"
+import { Toaster as Sonner, type ToasterProps } from "sonner"
+import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
-function Toaster({ style, toastOptions, ...props }: ToasterProps) {
+const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme()
+
   return (
     <Sonner
-      theme="light"
-      position="top-center"
+      theme={theme as ToasterProps["theme"]}
+      className="toaster group"
       icons={{
-        success: <CircleCheck size={18} className="text-royal" />,
-        info: <Info size={18} className="text-royal" />,
-        warning: <TriangleAlert size={18} className="text-gold" />,
-        error: <CircleAlert size={18} className="text-red-600" />,
-        loading: <LoaderCircle size={18} className="animate-spin text-royal" />,
+        success: (
+          <CircleCheckIcon className="size-4" />
+        ),
+        info: (
+          <InfoIcon className="size-4" />
+        ),
+        warning: (
+          <TriangleAlertIcon className="size-4" />
+        ),
+        error: (
+          <OctagonXIcon className="size-4" />
+        ),
+        loading: (
+          <Loader2Icon className="size-4 animate-spin" />
+        ),
       }}
       style={
         {
-          fontFamily: 'inherit',
-          '--normal-bg': '#ffffff',
-          '--normal-text': '#07142F',
-          '--normal-border': '#e2e8f0',
-          '--border-radius': '1rem',
-          ...style,
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "var(--radius)",
         } as React.CSSProperties
       }
       toastOptions={{
-        ...toastOptions,
         classNames: {
-          toast: '!text-sm !shadow-xl !shadow-royal/5',
-          title: '!font-bold',
-          description: '!text-slate-600',
-          ...toastOptions?.classNames,
+          toast: "cn-toast",
         },
       }}
       {...props}
     />
-  );
+  )
 }
 
-export { Toaster };
+export { Toaster }

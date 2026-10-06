@@ -453,7 +453,7 @@ The list below is the current V1 rule set. It replaces the earlier open question
 
 - Fellowship leadership: Chairman, Vice Chairman, General Secretary, Vice General Secretary, Treasurer.
 - Event leadership, separate from fellowship offices: Event Chairman, Event Treasurer, Event Secretary.
-- Ministry Leaders, appointed by the Chairman. Each ministry has its own Ministry Leader.
+- Ministry Leaders, appointed by the Chairman for one ministry in one fellowship year. See "Scoped responsibilities" below.
 - Active Member and Associate. An Associate is a graduated member who remains in the system. Members are not deleted after graduation.
 - The Treasurer has no operational responsibility in V1.
 
@@ -464,14 +464,14 @@ The list below is the current V1 rule set. It replaces the earlier open question
 - Both the General Secretary and the Vice General Secretary must take part. One of them acting alone does not complete approval. Approval creates the Fellowship ID.
 - Applications may be submitted and approved while the year is OPEN or CLOSED. The 48-hour expiry continues while CLOSED.
 - Required registration fields: email (primary unique identifier), first name, last name, phone, class, course, year of study, date of birth.
-- After approval, only the member may change those profile fields.
+- After approval, only the member may change those profile fields, except date of birth. See "Member profile" below.
 
 **Ministry**
 
 - Ministries are predefined. V1 does not create or delete ministries.
 - During onboarding a member selects one or more ministries.
 - After onboarding the member cannot change ministry membership.
-- A Ministry Leader can add or remove a member, including a member who did not ask to join, and can see and manage membership in other ministries.
+- A Ministry Leader can add or remove a member, including a member who did not ask to join, and can see and manage membership only in the ministry they lead. The Chairman sees and manages membership in every ministry.
 
 **Events**
 
@@ -507,6 +507,56 @@ The list below is the current V1 rule set. It replaces the earlier open question
 - An Event Chairman marks the member as a graduation candidate and sends that request to the Chairman.
 - The member becomes an Associate only after the Chairman confirms.
 - After that, the Associate does not belong to ministries or events. The person remains in the system.
+
+**Scoped responsibilities — approved by the project owner**
+
+Ministry leadership:
+
+1. A Ministry Leader assignment belongs to exactly one ministry and one fellowship year.
+2. In a fellowship year, a ministry has at most one current leader.
+3. In a fellowship year, a person holds at most one current Ministry Leader assignment. After being replaced, the same person may be appointed again in that year.
+4. Only the Chairman appoints a Ministry Leader, and only while the year is OPEN. The appointee must be an Active Member who has finished first-login onboarding. Holding a fellowship office as well is allowed. Appointment makes the appointee a member of that ministry if they are not one already. A replaced leader stays a member of that ministry; removing them is a separate action. The current leader of a ministry cannot be removed from that ministry's membership.
+5. Leadership changes only by replacement: the current assignment ends and the new one starts together. A leader is not removed without a replacement, except that graduation ends the leadership.
+6. Ministry leadership does not carry over to a new fellowship year. Earlier assignments remain as history.
+
+Fellowship years and offices:
+
+7. The operative fellowship year is the one year that is OPEN or CLOSED. An ARCHIVED year is never operative. The system enforces this in stored data.
+8. An office, ministry leadership, or event role is current only when it has not ended AND it belongs to the operative year. An assignment that has not ended but belongs to an earlier year is not current.
+9. Fellowship officers are not replaced during a year in V1.
+
+Events:
+
+10. An event role is current when it has not ended, the event belongs to the operative year, and the event is not ARCHIVED. The role can be exercised only while the year is OPEN and the event is ACTIVE.
+11. A person holds at most one current committee role per event.
+12. A year cannot be closed while any of its events is ACTIVE.
+13. A year cannot be archived until every one of its events is ARCHIVED.
+14. Graduation ends the person's current ministry leadership and event roles. The ministry may then have no leader until the Chairman appoints one.
+15. Archiving an event or a year records an end date on assignments that are still open, for history. Access decisions do not depend on those end dates.
+
+Rules 4, 5, and 12–15 describe workflows (appointment, replacement, year closure and archive, graduation) that are not built yet. They are recorded here so those workflows follow them.
+
+**Member profile — approved by the project owner**
+
+- After approval, the member may change their first name, last name, phone, class, course, and year of study.
+- The member may change their email. Because email is the sign-in address, the change takes effect only after the member confirms a code sent to the new address. The new email must not belong to another person. The previous address is told that the email was changed.
+- Date of birth is fixed after registration. The member can see it. Nobody can change it in V1, including the member and the Chairman.
+- No other member or leader, including the Chairman, can see a member's date of birth. A later super admin may see and correct it.
+
+**Ministry membership — approved by the project owner**
+
+- Members are added or removed only while the year is OPEN: by the Chairman in any ministry; by a current-year Ministry Leader only in the ministry they lead.
+- Only an Active Member who has finished first-login onboarding can be added.
+- A member may be removed from their last ministry and then belongs to none.
+- The current leader of a ministry cannot be removed from that ministry. Another leader is appointed first.
+- The member list of a ministry can be seen by the Chairman, the current-year leader of that ministry, and current members of that ministry, while the year is OPEN or CLOSED. Anyone else, including another ministry's leader or a member with no ministry, sees nothing.
+
+**Ministry rule changes — approved by the project owner on 2026-10-05**
+
+After frontend testing, the project owner changed two ministry rules. The wording above (the "Ministry" summary, Ministry leadership rule 4, and "Ministry membership") already reflects them.
+
+- A Ministry Leader sees and manages membership only in the ministry they lead. Previously a leader could see and manage membership in every ministry. The Chairman still sees and manages every ministry.
+- Appointing a Ministry Leader makes them a member of that ministry if they are not one already. Previously the appointee did not need to be a member. Approved with it: the appointee must have finished onboarding, a replaced leader stays a member, and the current leader cannot be removed from the ministry they lead.
 
 **Superseded source-document wording**
 

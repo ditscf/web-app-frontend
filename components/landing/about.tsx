@@ -9,15 +9,15 @@ export function About() {
   return (
     <section id="about" className="section-shell grid gap-12 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
       <motion.div
-        className="relative min-h-[560px] overflow-hidden rounded-[2rem] bg-cover bg-center shadow-premium"
+        className="relative min-h-[560px] overflow-hidden rounded-4xl bg-cover bg-center shadow-premium"
         style={{ backgroundImage: `url(${aboutImage.src})` }}
         initial={{ opacity: 0, x: -30 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/20 to-transparent" />
-        <div className="absolute bottom-6 left-6 right-6 rounded-[1.5rem] bg-white/92 p-5 backdrop-blur">
+        <div className="absolute inset-0 bg-linear-to-t from-navy/90 via-navy/20 to-transparent" />
+        <div className="absolute bottom-6 left-6 right-6 rounded-3xl bg-white/92 p-5 backdrop-blur-sm">
           <p className="font-black text-navy">Faith that becomes formation.</p>
           <p className="mt-2 text-sm leading-6 text-navy">
             DITSCF exists to help students encounter Christ, grow in the Word, discover purpose, and serve

@@ -13,7 +13,7 @@ export function Testimonials() {
         <SectionHeader center eyebrow="Testimonials" title="Stories from students and associates." />
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
           {testimonials.map((item) => (
-            <Card key={item.name} className="rounded-[2rem] p-7">
+            <Card key={item.name} className="rounded-4xl p-7">
               <MessageCircleHeart className="text-gold" size={34} />
               <p className="mt-6 text-lg leading-8 text-slate-700">“{item.quote}”</p>
               <Separator className="mt-7" />

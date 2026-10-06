@@ -52,7 +52,7 @@ export function Footer() {
                 placeholder="Email address"
                 className="h-10 min-w-0 flex-1 rounded-full border-0 bg-transparent px-4 font-normal shadow-none focus:border-transparent"
               />
-              <Button size="sm" variant="gold" type="submit">
+              <Button size="sm" type="submit">
                 Join
               </Button>
             </form>

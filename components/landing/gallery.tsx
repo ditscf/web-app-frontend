@@ -20,7 +20,7 @@ export function Gallery() {
           {gallery.map((item, index) => (
             <motion.figure
               key={item.label}
-              className="mb-5 break-inside-avoid overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-royal/5"
+              className="mb-5 break-inside-avoid overflow-hidden rounded-4xl bg-white shadow-xl shadow-royal/5"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

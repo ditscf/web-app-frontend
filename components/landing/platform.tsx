@@ -24,7 +24,7 @@ export function DigitalPlatform() {
               return (
                 <div
                   key={feature.label}
-                  className="flex items-center gap-3 rounded-2xl bg-white/10 p-4 backdrop-blur"
+                  className="flex items-center gap-3 rounded-2xl bg-white/10 p-4 backdrop-blur-sm"
                 >
                   <Icon size={20} className="text-gold" />
                   <strong>{feature.label}</strong>
@@ -34,16 +34,16 @@ export function DigitalPlatform() {
           </div>
         </div>
         <motion.div
-          className="rounded-[2rem] border border-white/10 bg-white/10 p-4 shadow-premium backdrop-blur"
+          className="rounded-4xl border border-white/10 bg-white/10 p-4 shadow-premium backdrop-blur-sm"
           initial={{ opacity: 0, y: 30, rotateX: 8 }}
           whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <div className="rounded-[1.5rem] bg-white p-5 text-navy">
+          <div className="rounded-3xl bg-white p-5 text-navy">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <strong>DITSCF Command Center</strong>
-              <Badge variant="live">Live</Badge>
+              <Badge variant="secondary">Live</Badge>
             </div>
             <div className="mt-5 grid gap-4 md:grid-cols-[0.7fr_1.3fr]">
               <div className="space-y-3">

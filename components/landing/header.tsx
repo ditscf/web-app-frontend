@@ -53,7 +53,7 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Button asChild variant="gold" size="sm" className="hidden sm:inline-flex">
+            <Button asChild size="sm" className="hidden sm:inline-flex">
               <Link href="/auth/signin">Join Fellowship</Link>
             </Button>
             <Button

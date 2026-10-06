@@ -31,7 +31,7 @@ export function Ministries() {
         {ministries.map((ministry, index) => (
           <MotionCard
             key={ministry.title}
-            className="group overflow-hidden rounded-[2rem] border-slate-200 p-0"
+            className="group overflow-hidden rounded-4xl border-slate-200 p-0"
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
