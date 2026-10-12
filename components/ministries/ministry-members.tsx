@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { getUserFacingMessage, toApiError, type ApiErrorKind } from '@/lib/api/errors';
+import { getLookupActionBlocker, lookupMember } from '@/lib/api/members';
 import {
   addMinistryMember,
   listMinistryLeaders,
@@ -26,7 +27,7 @@ import {
   type MinistryMembers as MinistryMembersData,
   type MinistryPerson,
 } from '@/lib/api/ministries';
-import { canManageMinistryMembers, canOverseeMinistryMembers } from '@/lib/auth/access';
+import { canLookupMember, canManageMinistryMembers, canOverseeMinistryMembers } from '@/lib/auth/access';
 import { FELLOWSHIP_ID_LENGTH, fellowshipIdSchema } from '@/lib/validation';
 
 type MembersState =
@@ -36,7 +37,9 @@ type MembersState =
   | { status: 'not_found' }
   | { status: 'error'; message: string };
 
-type PendingAction = { type: 'add'; fellowshipId: string } | { type: 'remove'; member: MinistryPerson };
+type PendingAction =
+  | { type: 'add'; member: { fellowshipId: string; firstName: string; lastName: string } }
+  | { type: 'remove'; member: MinistryPerson };
 
 const MINISTRIES_PATH = '/dashboard/ministries';
 const ADD_INPUT_ID = 'add-member-fellowship-id';
@@ -65,6 +68,7 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
   const [fellowshipId, setFellowshipId] = useState('');
   const [addError, setAddError] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [isLookingUp, setIsLookingUp] = useState(false);
   const [isWorking, setIsWorking] = useState(false);
 
   useEffect(() => {
@@ -110,14 +114,38 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
     if (!isOpen && !isWorking) setPendingAction(null);
   }
 
-  function handleAddSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleAddSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const parsed = fellowshipIdSchema.safeParse(fellowshipId);
     if (!parsed.success) {
       setAddError(parsed.error.issues[0]?.message ?? `A Fellowship ID has ${FELLOWSHIP_ID_LENGTH} digits.`);
       return;
     }
-    setPendingAction({ type: 'add', fellowshipId: parsed.data });
+
+    setIsLookingUp(true);
+    try {
+      const member = await lookupMember(parsed.data);
+      const blocker = getLookupActionBlocker(member, 'add');
+      if (blocker) {
+        setAddError(blocker);
+        return;
+      }
+      setPendingAction({
+        type: 'add',
+        member: { fellowshipId: member.fellowshipId, firstName: member.firstName, lastName: member.lastName },
+      });
+    } catch (error) {
+      const apiError = toApiError(error);
+      if (apiError.kind === 'unauthenticated') return;
+      if (ADD_FIELD_ERROR_KINDS.includes(apiError.kind)) {
+        setAddError(apiError.message);
+        return;
+      }
+      toast.error("We couldn't confirm that Fellowship ID", { description: getUserFacingMessage(error) });
+      if (apiError.kind === 'forbidden') reloadMembers();
+    } finally {
+      setIsLookingUp(false);
+    }
   }
 
   async function handleConfirm() {
@@ -126,7 +154,7 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
     setIsWorking(true);
     try {
       if (pendingAction.type === 'add') {
-        const { ministry, member } = await addMinistryMember(ministryId, pendingAction.fellowshipId);
+        const { ministry, member } = await addMinistryMember(ministryId, pendingAction.member.fellowshipId);
         setFellowshipId('');
         toast.success(`${getFullName(member)} is now in ${ministry.name}`, {
           description: `Fellowship ID ${member.fellowshipId}`,
@@ -212,7 +240,7 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
         </Card>
       ) : null}
 
-      {membersState.status === 'ready' && canManage ? (
+      {membersState.status === 'ready' && canManage && canLookupMember(actor) ? (
         <Card className="rounded-2xl p-6 shadow-none">
           <h2 className="text-lg font-black text-navy">Add a member</h2>
           <p className="mt-1 text-sm text-slate-600">
@@ -224,15 +252,15 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
                 id={ADD_INPUT_ID}
                 value={fellowshipId}
                 error={addError}
-                disabled={isWorking}
+                disabled={isWorking || isLookingUp}
                 onValueChange={(value) => {
                   setFellowshipId(value);
                   if (addError) setAddError(null);
                 }}
               />
             </div>
-            <Button type="submit" className="sm:mt-7" disabled={isWorking}>
-              Add member
+            <Button type="submit" className="sm:mt-7" disabled={isWorking || isLookingUp}>
+              {isLookingUp ? 'Checking...' : 'Add member'}
             </Button>
           </form>
         </Card>
@@ -283,9 +311,11 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
             <>
               <AlertDialogTitle>Add this member to {ministryName}?</AlertDialogTitle>
               <AlertDialogDescription>
-                Add the member with Fellowship ID{' '}
-                <strong className="font-bold text-navy">{pendingAction.fellowshipId}</strong> to {ministryName}. Check
-                the ID carefully: the member&apos;s name is shown after adding.
+                Add{' '}
+                <strong className="font-bold text-navy">
+                  {getFullName(pendingAction.member)}</strong>{' '}
+                ({pendingAction.member.fellowshipId}) to {ministryName}? Check
+                the ID carefully.
               </AlertDialogDescription>
             </>
           ) : null}

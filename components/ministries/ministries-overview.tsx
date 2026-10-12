@@ -11,11 +11,12 @@ import { Card } from '@/components/ui/card';
 import { getUserFacingMessage, toApiError } from '@/lib/api/errors';
 import {
   listMinistryLeaders,
+  listOwnMinistries,
   type LeaderAppointment,
   type MinistryLeaders,
   type MinistryWithLeader,
 } from '@/lib/api/ministries';
-import { canAppointMinistryLeaders, canOverseeMinistryMembers, canViewMinistryLeaders } from '@/lib/auth/access';
+import { canAppointMinistryLeaders, canViewMinistryLeaders, canViewMinistryMembers } from '@/lib/auth/access';
 import { YEAR_STATUS_LABELS } from '@/lib/auth/responsibility-labels';
 
 type LeadersState =
@@ -45,11 +46,22 @@ export function MinistriesOverview() {
   const canAppoint = canAppointMinistryLeaders(actor);
   const [leadersState, setLeadersState] = useState<LeadersState>({ status: 'loading' });
   const [loadAttempt, setLoadAttempt] = useState(0);
+  const [ownMinistryIds, setOwnMinistryIds] = useState<ReadonlySet<string>>(new Set());
   const [appointTarget, setAppointTarget] = useState<MinistryWithLeader | null>(null);
 
   useEffect(() => {
     if (!isAllowed) return;
     let isActive = true;
+
+    listOwnMinistries()
+      .then(({ ministries }) => {
+        if (isActive) setOwnMinistryIds(new Set(ministries.map((item) => item.ministry.id)));
+      })
+      .catch((error: unknown) => {
+        if (!isActive) return;
+        if (toApiError(error).kind === 'unauthenticated') return;
+        setOwnMinistryIds(new Set());
+      });
 
     listMinistryLeaders()
       .then((data) => {
@@ -139,7 +151,7 @@ export function MinistriesOverview() {
               <li key={item.ministry.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
                 <div className="min-w-0">
                   <h2 className="font-black text-navy">
-                    {canOverseeMinistryMembers(actor, item.ministry.id) ? (
+                    {canViewMinistryMembers(actor, item.ministry.id, ownMinistryIds) ? (
                       <Link
                         href={`/dashboard/ministries/${item.ministry.id}`}
                         className="rounded-sm hover:text-royal hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gold"
