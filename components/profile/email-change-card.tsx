@@ -1,8 +1,9 @@
 'use client';
 
-import { ArrowLeft, PencilLine } from 'lucide-react';
+import { ArrowLeft, Mail, PencilLine } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
+import { dashboardCardClassName } from '@/components/dashboard/dashboard-page';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -173,36 +174,51 @@ export function EmailChangeCard({ email, onChanged }: EmailChangeCardProps) {
   }
 
   return (
-    <Card className='p-6 shadow-none'>
-      <div className='flex items-center justify-between gap-3'>
-        <h2 className='text-lg font-bold text-foreground'>Email address</h2>
+    <Card className={cn('relative overflow-hidden p-6', dashboardCardClassName)}>
+      <div
+        className='pointer-events-none absolute inset-0 bg-brand-radial opacity-20'
+        aria-hidden
+      />
+      <div className='relative'>
+        <div className='flex items-start justify-between gap-3'>
+          <div className='flex items-start gap-3'>
+            <div className='flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary'>
+              <Mail size={20} aria-hidden />
+            </div>
+            <h2 className='pt-2 text-lg font-bold text-foreground'>
+              Email address
+            </h2>
+          </div>
+          {state.step === 'idle' ? (
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              className='shrink-0 normal-case tracking-normal text-primary'
+              onClick={handleStart}
+            >
+              <PencilLine size={14} aria-hidden='true' /> Change email
+            </Button>
+          ) : null}
+        </div>
+
         {state.step === 'idle' ? (
-          <Button
-            type='button'
-            variant='ghost'
-            size='sm'
-            className='-mr-2 text-primary'
-            onClick={handleStart}
-          >
-            <PencilLine size={14} aria-hidden='true' /> Change email
-          </Button>
+          <div className='mt-5 border border-border bg-muted/40 p-4'>
+            <p className='break-all text-sm font-semibold text-foreground'>
+              {email}
+            </p>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              You sign in with this email.
+            </p>
+          </div>
         ) : null}
       </div>
-
-      {state.step === 'idle' ? (
-        <div className='mt-4'>
-          <p className='break-all font-bold text-foreground'>{email}</p>
-          <p className='mt-1 text-sm text-muted-foreground'>
-            You sign in with this email.
-          </p>
-        </div>
-      ) : null}
 
       {state.step === 'email' ? (
         <form
           noValidate
           onSubmit={handleRequestSubmit}
-          className='mt-4 grid gap-5'
+          className='relative mt-5 grid gap-5 border-t border-border pt-5'
         >
           <p className='text-sm text-muted-foreground'>
             We&apos;ll send a {LOGIN_CODE_LENGTH}-digit code to the new address.
@@ -260,7 +276,7 @@ export function EmailChangeCard({ email, onChanged }: EmailChangeCardProps) {
       ) : null}
 
       {state.step === 'code' ? (
-        <div className='mt-4 grid gap-5'>
+        <div className='relative mt-5 grid gap-5 border-t border-border pt-5'>
           <p className='text-sm text-muted-foreground'>
             We sent a {LOGIN_CODE_LENGTH}-digit code to{' '}
             <strong className='break-all font-bold text-foreground'>

@@ -73,7 +73,7 @@ export function Header() {
               size='icon'
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isMenuOpen}
-              className='lg:hidden'
+              className='border-sidebar-foreground/25 bg-sidebar-foreground/10 text-sidebar-foreground hover:bg-sidebar-foreground/15 hover:text-sidebar-foreground lg:hidden'
               onClick={handleToggleMenu}
             >
               {isMenuOpen ? <X size={19} /> : <Menu size={19} />}

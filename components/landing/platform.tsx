@@ -10,7 +10,7 @@ export function DigitalPlatform() {
   return (
     <section
       id='platform'
-      className='navy-grid relative overflow-hidden bg-sidebar py-24 text-sidebar-foreground'
+      className='navy-grid relative overflow-hidden bg-sidebar py-20 text-sidebar-foreground'
     >
       <div className='absolute inset-0 bg-brand-radial' />
       <div className='mx-auto w-full max-w-6xl px-4 relative grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center'>

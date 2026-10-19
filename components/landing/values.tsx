@@ -11,14 +11,14 @@ const MotionCard = motion.create(Card);
 
 export function Values() {
   return (
-    <section className='bg-muted py-24'>
+    <section className='bg-muted py-20'>
       <div className='mx-auto w-full max-w-6xl px-4'>
         <SectionHeader
           center
           eyebrow='Mission, Vision & Core Values'
           title='Convictions that guide our worship, leadership, and service.'
         />
-        <div className='mt-14 grid gap-4 md:grid-cols-3'>
+        <div className='mt-10 grid gap-4 md:grid-cols-3'>
           {values.map((value, index) => (
             <MotionCard
               key={value.title}

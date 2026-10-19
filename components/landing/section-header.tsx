@@ -32,7 +32,7 @@ export function SectionHeader({
     >
       <p
         className={cn(
-          'mb-4 text-sm font-bold uppercase tracking-[0.24em]',
+          'mb-3 text-xs font-semibold uppercase tracking-widest',
           tone === 'dark' ? 'text-sidebar-primary' : 'text-accent',
         )}
       >
@@ -40,14 +40,20 @@ export function SectionHeader({
       </p>
       <h2
         className={cn(
-          'text-4xl font-bold leading-[1.02] tracking-tight md:text-6xl',
+          'text-3xl font-bold leading-tight tracking-tight md:text-4xl',
           tone === 'dark' ? 'text-sidebar-foreground' : 'text-foreground',
         )}
       >
         {title}
       </h2>
       {text ? (
-        <p className={cn('mt-6 text-lg leading-8', tone === 'dark' ? 'text-sidebar-foreground/70' : 'text-muted-foreground')}>
+        <p
+          className={cn(
+            'mt-4 max-w-2xl text-base leading-7',
+            tone === 'dark' ? 'text-sidebar-foreground/70' : 'text-muted-foreground',
+            center && 'mx-auto',
+          )}
+        >
           {text}
         </p>
       ) : null}

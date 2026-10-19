@@ -21,6 +21,8 @@ import { cn } from '@/lib/utils';
 import { LOGIN_CODE_LENGTH, loginCodeSchema, loginEmailSchema } from '@/lib/validation';
 
 const CODE_INPUT_ID = 'verification-code';
+const OTP_SLOT_CLASS =
+  'size-11 border border-input bg-card text-base font-semibold shadow-xs data-[active=true]:border-ring data-[active=true]:ring-2 data-[active=true]:ring-ring/30 aria-invalid:border-destructive';
 const SESSION_NOT_KEPT_MESSAGE =
   "Your browser didn't keep the sign-in session. Allow cookies for this site and try again.";
 const FRONTEND_SESSION_ERROR_MESSAGE = "We couldn't finish signing you in. Please try again.";
@@ -213,17 +215,27 @@ export function SignInForm() {
           }
         >
           <form onSubmit={handleCodeSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor={CODE_INPUT_ID}>Verification code</Label>
-              <InputOTP id={CODE_INPUT_ID} maxLength={LOGIN_CODE_LENGTH} value={code} onChange={handleCodeChange}>
-                <InputOTPGroup>
+            <div className="space-y-3">
+              <Label htmlFor={CODE_INPUT_ID} className="block text-center">
+                Verification code
+              </Label>
+              <InputOTP
+                id={CODE_INPUT_ID}
+                maxLength={LOGIN_CODE_LENGTH}
+                value={code}
+                onChange={handleCodeChange}
+                containerClassName="justify-center"
+                aria-invalid={Boolean(codeError)}
+                aria-describedby={codeError ? 'code-error' : undefined}
+              >
+                <InputOTPGroup className="gap-2">
                   {Array.from({ length: LOGIN_CODE_LENGTH }, (_, index) => (
-                    <InputOTPSlot key={index} index={index} />
+                    <InputOTPSlot key={index} index={index} className={OTP_SLOT_CLASS} />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
               {codeError ? (
-                <p id="code-error" role="alert" className="text-sm font-semibold text-destructive">
+                <p id="code-error" role="alert" className="text-center text-sm font-semibold text-destructive">
                   {codeError}
                 </p>
               ) : null}
@@ -232,17 +244,24 @@ export function SignInForm() {
               {isSigningIn ? 'Signing in...' : 'Verify and sign in'} <ArrowRight size={18} />
             </Button>
           </form>
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm">
-            <Button type="button" variant="ghost" size="sm" className="-ml-4" onClick={handleChangeEmail}>
-              <ArrowLeft size={16} /> Use a different email
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-4 text-xs sm:text-sm">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-auto shrink-0 px-0 normal-case tracking-normal text-muted-foreground hover:text-foreground"
+              onClick={handleChangeEmail}
+            >
+              <ArrowLeft size={16} aria-hidden />
+              Use a different email
             </Button>
-            <p className="text-muted-foreground">
+            <p className="shrink-0 text-muted-foreground">
               Didn&apos;t get it?{' '}
               <button
                 type="button"
                 onClick={handleResendCode}
                 disabled={isRequestingCode || isSigningIn}
-                className="rounded-full disabled:opacity-50 font-bold text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                className="font-bold text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
               >
                 Resend code
               </button>

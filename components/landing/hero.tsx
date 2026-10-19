@@ -44,14 +44,14 @@ export function Hero() {
             variants={fadeUp}
             transition={{ duration: 0.8 }}
           >
-            <div className='mb-7 inline-flex items-center gap-2 border border-sidebar-foreground/15 bg-sidebar-foreground/10 px-4 py-2 text-sm font-semibold backdrop-blur-sm'>
-              <Sparkles size={16} className='text-sidebar-primary' />
+            <div className='mb-6 inline-flex items-center gap-2 border border-sidebar-foreground/15 bg-sidebar-foreground/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest backdrop-blur-sm'>
+              <Sparkles size={14} className='text-sidebar-primary' />
               Dar es Salaam Institute of Technology
             </div>
-            <h1 className='max-w-5xl text-6xl font-bold leading-[0.95] tracking-tight md:text-7xl xl:text-8xl'>
+            <h1 className='max-w-4xl text-5xl font-bold leading-[0.98] tracking-tight md:text-6xl xl:text-7xl'>
               One Family For Gospel.
             </h1>
-            <div className='mt-10 flex flex-wrap gap-3'>
+            <div className='mt-8 flex flex-wrap gap-3'>
               <Button asChild size='lg'>
                 <Link href='/auth/signin'>
                   Join Fellowship <ArrowRight size={18} />
@@ -83,7 +83,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.35 }}
           >
             <div className='flex items-center justify-between'>
-              <span className='text-sm font-bold uppercase tracking-[0.18em] text-accent'>
+              <span className='text-xs font-semibold uppercase tracking-widest text-accent'>
                 Live Impact
               </span>
               <Badge variant='secondary'>2026</Badge>

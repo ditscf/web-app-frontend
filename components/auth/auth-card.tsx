@@ -21,18 +21,18 @@ export function AuthCard({
         className,
       )}
     >
-      <p className='text-sm font-bold uppercase tracking-[0.18em] text-accent'>
+      <p className='text-xs font-semibold uppercase tracking-widest text-accent'>
         {eyebrow}
       </p>
-      <h1 className='mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl'>
+      <h1 className='mt-2 text-2xl font-bold leading-tight tracking-tight sm:text-3xl'>
         {title}
       </h1>
       {description ? (
-        <div className='mt-3 leading-7 text-muted-foreground'>
+        <div className='mt-2 text-sm leading-6 text-muted-foreground'>
           {description}
         </div>
       ) : null}
-      <div className='mt-8'>{children}</div>
+      <div className='mt-6'>{children}</div>
     </section>
   );
 }

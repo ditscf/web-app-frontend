@@ -7,13 +7,13 @@ import { leaders } from '@/lib/site-content';
 
 export function Leadership() {
   return (
-    <section className='mx-auto w-full max-w-6xl px-4 py-24'>
+    <section className='mx-auto w-full max-w-6xl px-4 py-20'>
       <SectionHeader
         center
         eyebrow='Leadership Team'
         title='Servant leadership with accountability, prayer, and excellence.'
       />
-      <div className='mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-5'>
+      <div className='mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-5'>
         {leaders.map((leader) => (
           <Card key={leader.role} className='overflow-hidden text-center'>
             <div className='relative h-44'>

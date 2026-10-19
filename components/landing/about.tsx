@@ -9,10 +9,10 @@ export function About() {
   return (
     <section
       id='about'
-      className='mx-auto w-full max-w-6xl px-4 grid gap-12 py-24 lg:grid-cols-[0.9fr_1.1fr] lg:items-center'
+      className='mx-auto grid w-full max-w-6xl gap-10 px-4 py-20 lg:grid-cols-[0.85fr_1.15fr] lg:items-center'
     >
       <motion.div
-        className='relative min-h-[560px] overflow-hidden bg-cover bg-center shadow-lg'
+        className='relative min-h-[480px] overflow-hidden bg-cover bg-center shadow-lg'
         style={{ backgroundImage: `url(${aboutImage.src})` }}
         initial={{ opacity: 0, x: -30 }}
         whileInView={{ opacity: 1, x: 0 }}

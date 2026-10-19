@@ -26,6 +26,8 @@ DITSCF colors are mapped onto shadcn tokens (not custom Tailwind color names lik
 
 **Why:** Presets treat `--primary` as the main fill. DITSCF uses gold for buttons and navy for hero/footer/auth/dashboard chrome. Shells use `bg-sidebar`, not `bg-primary`.
 
+`--radius` is `0` so square corners stay even if a utility uses a radius token. Sera components also set `rounded-none`. Re-set `--radius: 0` after a preset rewrite if the new theme restores a larger radius and you still want sharp corners.
+
 Documented also in `ui-components.md` → Brand token map. Comments at the top of `:root` in `globals.css` must stay.
 
 ### 2. Landing / auth CSS helpers (`app/globals.css`)
@@ -39,6 +41,10 @@ Documented also in `ui-components.md` → Brand token map. Comments at the top o
 
 These are **not** part of shadcn. Theme/preset rewrites that replace `globals.css` delete them unless you paste them back.
 
+### 2b. Interactive pointer cursor (`app/globals.css` `@layer base`)
+
+Sera `Button` renders a native `<button>` without `cursor-pointer` (landing CTAs often use `asChild` + `Link`, which already show a pointer). A small **base** block sets `cursor: pointer` on `button`, `[data-slot="button"]`, and `[data-slot="sidebar-menu-button"]`. Re-add after a preset wipe. `components/ui/button.tsx` and `sidebar.tsx` menu buttons also include `cursor-pointer` in their CVA bases so a UI reinstall stays consistent.
+
 ### 3. Feature-level overrides (not in `components/ui/`)
 
 These stay when you reinstall UI parts; they can fight a new preset’s defaults:
@@ -47,7 +53,8 @@ These stay when you reinstall UI parts; they can fight a new preset’s defaults
 | --- | --- | --- |
 | Featured Event badge | Filled gold (`bg-primary px-2…`) — Sera default badge is text-only | `components/landing/events.tsx` |
 | Sign-up date of birth | Calendar + Popover trigger styled like underline `Input` | `components/auth/sign-up-form.tsx` |
-| Footer socials | Ghost, no fill, `normal-case` (Sera buttons are uppercase) | `components/landing/footer.tsx` |
+| Footer socials | Ghost, no fill, `normal-case` (Sera buttons are uppercase). Icons are `react-icons` (`FaInstagram`, `FaYoutube`) | `components/landing/footer.tsx` |
+| Section titles | Shared scale in `SectionHeader`: small uppercase eyebrow (`tracking-widest`), title `text-3xl` / `md:text-4xl` | `components/landing/section-header.tsx` |
 | Dashboard / forms cards | Often `shadow-none` on `Card` | dashboard, profile, ministries, applications, onboarding |
 | Landing chrome | Glass, gradients, framer-motion, navy sections | `components/landing/*`, `auth-card.tsx` |
 

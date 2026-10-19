@@ -10,7 +10,9 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useCurrentActor } from '@/components/auth/current-actor-provider';
+import { dashboardCardClassName } from '@/components/dashboard/dashboard-page';
 import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import {
   listPendingApplications,
   PENDING_APPLICATIONS_LIMIT,
@@ -167,32 +169,50 @@ export function NeedsAttention() {
   if (items.length === 0) return null;
 
   return (
-    <Card className='p-6 shadow-none'>
-      <h2 className='text-lg font-bold text-foreground'>
-        Needs your attention
-      </h2>
-      <ul className='mt-3 grid gap-1'>
+    <section aria-labelledby="needs-attention-heading">
+      <div className="mb-4">
+        <h2 id="needs-attention-heading" className="text-lg font-bold text-foreground">
+          Needs your attention
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Open an item below to review applications or ministry leadership.
+        </p>
+      </div>
+      <ul className="grid min-w-0 gap-4 sm:grid-cols-2">
         {items.map(({ key, label, href, icon: Icon }) => (
           <li key={key}>
-            <Link
-              href={href}
-              className='-mx-3 flex items-center gap-3 px-3 py-3 font-semibold text-foreground transition hover:bg-muted focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
-            >
-              <Icon
-                size={20}
-                className='shrink-0 text-primary'
-                aria-hidden='true'
-              />
-              <span className='flex-1'>{label}</span>
-              <ChevronRight
-                size={18}
-                className='shrink-0 text-muted-foreground'
-                aria-hidden='true'
-              />
+            <Link href={href} className="group block h-full focus-visible:outline-hidden">
+              <Card
+                className={cn(
+                  'relative h-full overflow-hidden p-5 transition-colors group-hover:border-primary/35 group-hover:bg-primary/5 group-focus-visible:ring-2 group-focus-visible:ring-ring',
+                  dashboardCardClassName,
+                )}
+              >
+                <div
+                  className="pointer-events-none absolute inset-0 bg-brand-radial opacity-0 transition-opacity group-hover:opacity-25"
+                  aria-hidden
+                />
+                <div className="relative flex items-start gap-3">
+                  <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+                    <Icon size={20} aria-hidden />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-foreground">{label}</p>
+                    <p className="mt-1 text-xs font-semibold tracking-wide text-primary uppercase">
+                      Review now
+                    </p>
+                  </div>
+                  <ChevronRight
+                    size={18}
+                    className="mt-1 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+                    aria-hidden
+                  />
+                </div>
+              </Card>
             </Link>
           </li>
         ))}
       </ul>
-    </Card>
+    </section>
   );
 }
