@@ -27,6 +27,17 @@
   body {
     @apply min-w-80 overflow-x-hidden bg-background text-foreground;
   }
+
+  /*
+    Native <button> uses the default arrow; landing CTAs often use Button asChild + Link
+    (pointer). One base rule keeps dashboard/app controls consistent without per-page classes.
+    Re-add after a globals.css preset wipe. Dropdown/select items keep their own cursor.
+  */
+  button:not(:disabled),
+  [data-slot='button']:not(:disabled),
+  [data-slot='sidebar-menu-button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
 }
 
 /*
@@ -71,7 +82,8 @@
   --chart-4: oklch(0.337 0.125 260.9);
   --chart-5: oklch(0.879 0.143 87.6);
 
-  --radius: 0.75rem;
+  /* Square corners match Sera (rounded-none). Keep 0 so radius utilities stay sharp. */
+  --radius: 0;
 
   /* Navy — dark shells (hero, footer, auth, dashboard nav) */
   --sidebar: oklch(0.198 0.057 262.6); /* #07142F */

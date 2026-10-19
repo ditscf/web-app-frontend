@@ -55,7 +55,7 @@ shadcn presets treat `--primary` as the main brand fill. For DITSCF, the main **
 1. **Never use `bg-primary` / `from-primary` for large dark shells.** Use `bg-sidebar` / `from-sidebar`. Primary is gold.
 2. **Never use `bg-primary-foreground` as a “white glass” overlay.** `--primary-foreground` is navy (ink on gold). Glass cards must use `bg-card` / `bg-card/92` with `text-card-foreground` and `text-muted-foreground`.
 3. **Do not invent brand utilities** (`bg-royal`, `text-gold`, raw hex in components). Remap tokens in `:root` / `.dark` only.
-4. After any command that rewrites `app/globals.css`, **re-apply the Brand token map** and landing helpers. Full inventory + checklist: `docs/design/custom-styling.md`.
+4. After any command that rewrites `app/globals.css`, **re-apply the Brand token map**, `--radius: 0`, and landing helpers. Full inventory + checklist: `docs/design/custom-styling.md`.
 5. Feature code should prefer semantic roles: CTA → `primary`, royal action → `accent`, dark chrome → `sidebar`, readable surface → `card` / `background`.
 
 ## Rules

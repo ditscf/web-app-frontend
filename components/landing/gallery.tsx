@@ -9,18 +9,18 @@ import { gallery } from '@/lib/site-content';
 
 export function Gallery() {
   return (
-    <section className='bg-muted py-24'>
+    <section className='bg-muted py-20'>
       <div className='mx-auto w-full max-w-6xl px-4'>
         <SectionHeader
           center
           eyebrow='Gallery'
           title='Worship, prayer, outreach, conferences, and fellowship life.'
         />
-        <div className='mt-14 columns-1 gap-5 sm:columns-2 lg:columns-3'>
+        <div className='mt-10 columns-1 gap-5 sm:columns-2 lg:columns-3'>
           {gallery.map((item, index) => (
             <motion.figure
               key={item.label}
-              className='mb-5 break-inside-avoid overflow-hidden bg-card shadow-xl'
+              className='mb-5 break-inside-avoid overflow-hidden bg-card shadow-sm ring-1 ring-foreground/5'
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

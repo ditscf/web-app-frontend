@@ -14,7 +14,7 @@ const MotionCard = motion.create(Card);
 
 export function Ministries() {
   return (
-    <section id='ministries' className='mx-auto w-full max-w-6xl px-4 py-24'>
+    <section id='ministries' className='mx-auto w-full max-w-6xl px-4 py-20'>
       <div className='flex flex-col justify-between gap-8 lg:flex-row lg:items-end'>
         <SectionHeader
           eyebrow='Ministries Showcase'
@@ -31,7 +31,7 @@ export function Ministries() {
           </Link>
         </Button>
       </div>
-      <div className='mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3'>
+      <div className='mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3'>
         {ministries.map((ministry, index) => (
           <MotionCard
             key={ministry.title}
@@ -41,7 +41,7 @@ export function Ministries() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: index * 0.05 }}
           >
-            <div className='relative h-64 overflow-hidden'>
+            <div className='relative h-48 overflow-hidden'>
               <Image
                 src={ministry.image}
                 alt=''
@@ -51,7 +51,7 @@ export function Ministries() {
               />
             </div>
             <div className='p-6'>
-              <CardTitle className='text-2xl'>{ministry.title}</CardTitle>
+              <CardTitle className='text-xl normal-case tracking-normal'>{ministry.title}</CardTitle>
               <CardDescription className='mt-3'>
                 {ministry.description}
               </CardDescription>

@@ -1,5 +1,6 @@
 'use client';
 
+import { UserPlus } from 'lucide-react';
 import { useState, type FormEvent, type InputHTMLAttributes } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -193,18 +194,31 @@ export function AssistedRegistrationForm({
   }
 
   return (
-    <Card className='p-6 shadow-none'>
-      <h2 className='text-lg font-bold text-foreground'>Register a member</h2>
-      <p className='mt-1 text-sm text-muted-foreground'>
-        Enter their details. This counts as your approval step; the Vice General
-        Secretary must still approve before they become a member. The
-        registration expires in 48 hours if it is not completed.
-      </p>
+    <Card className='relative overflow-hidden p-6 shadow-none'>
+      <div
+        className='pointer-events-none absolute inset-0 bg-brand-radial opacity-25'
+        aria-hidden
+      />
+      <div className='relative'>
+        <div className='flex items-start gap-3'>
+          <div className='flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary'>
+            <UserPlus size={20} aria-hidden />
+          </div>
+          <div>
+            <h2 className='text-lg font-bold text-foreground'>Register a member</h2>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              Enter their details. This counts as your approval step; the Vice General
+              Secretary must still approve before they become a member. The
+              registration expires in 48 hours if it is not completed.
+            </p>
+          </div>
+        </div>
+      </div>
 
       <form
         noValidate
         onSubmit={handleSubmit}
-        className='mt-6 grid gap-4 sm:grid-cols-2'
+        className='relative mt-6 grid gap-4 border-t border-border pt-6 sm:grid-cols-2'
       >
         <TextField
           id='assisted-firstName'

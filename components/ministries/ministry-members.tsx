@@ -1,10 +1,14 @@
 'use client';
 
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Crown, UserPlus, UsersRound } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { useCurrentActor } from '@/components/auth/current-actor-provider';
+import {
+  DashboardPage,
+  dashboardCardClassName,
+} from '@/components/dashboard/dashboard-page';
 import { NoAccess } from '@/components/dashboard/no-access';
 import { FellowshipIdField } from '@/components/ministries/fellowship-id-field';
 import {
@@ -37,6 +41,7 @@ import {
   canOverseeMinistryMembers,
 } from '@/lib/auth/access';
 import { FELLOWSHIP_ID_LENGTH, fellowshipIdSchema } from '@/lib/validation';
+import { cn } from '@/lib/utils';
 
 type MembersState =
   | { status: 'loading' }
@@ -58,13 +63,11 @@ type PendingAction =
 
 const MINISTRIES_PATH = '/dashboard/ministries';
 const ADD_INPUT_ID = 'add-member-fellowship-id';
-/** Refusals about the person entered: shown under the field so the ID can be corrected. */
 const ADD_FIELD_ERROR_KINDS: readonly ApiErrorKind[] = [
   'validation',
   'not_found',
   'conflict',
 ];
-/** The list changed or the action is no longer allowed, so reload it. */
 const LIST_CHANGED_KINDS: readonly ApiErrorKind[] = [
   'forbidden',
   'not_found',
@@ -81,6 +84,51 @@ function getFullName(
 
 function formatMemberCount(count: number): string {
   return count === 1 ? '1 member' : `${count} members`;
+}
+
+function SummaryStat({
+  icon: Icon,
+  label,
+  value,
+  hint,
+}: {
+  icon: typeof UsersRound;
+  label: string;
+  value: string;
+  hint?: string;
+}) {
+  return (
+    <Card className={cn('relative overflow-hidden p-5', dashboardCardClassName)}>
+      <div
+        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-30"
+        aria-hidden
+      />
+      <div className="relative flex gap-4">
+        <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+          <Icon size={20} aria-hidden />
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+            {label}
+          </p>
+          <p className="mt-1 truncate text-lg font-bold text-foreground">{value}</p>
+          {hint ? (
+            <p className="mt-0.5 text-sm text-muted-foreground">{hint}</p>
+          ) : null}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function MemberCardSkeleton() {
+  return (
+    <Card className={cn('h-full p-5', dashboardCardClassName)}>
+      <div className="mb-3 h-0.5 w-10 animate-pulse bg-muted" />
+      <div className="h-5 w-2/3 animate-pulse bg-muted" />
+      <div className="mt-3 h-4 w-full animate-pulse bg-muted" />
+    </Card>
+  );
 }
 
 export function MinistryMembers({ ministryId }: { ministryId: string }) {
@@ -120,7 +168,6 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
           setMembersState({ status: 'forbidden', message: apiError.message });
           return;
         }
-        // An id that isn't a UUID is refused with 400, which is the same as an unknown ministry here.
         if (apiError.kind === 'not_found' || apiError.kind === 'validation') {
           setMembersState({ status: 'not_found' });
           return;
@@ -244,174 +291,253 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
 
   const ministryName =
     membersState.status === 'ready' ? membersState.data.ministry.name : null;
+  const memberCount =
+    membersState.status === 'ready' ? membersState.data.members.length : 0;
+  const leader =
+    membersState.status === 'ready' ? membersState.leader : null;
 
   return (
-    <div className='mx-auto grid max-w-4xl gap-6'>
-      <header>
-        <Button
-          asChild
-          variant='ghost'
-          size='sm'
-          className='-ml-3 text-primary'
-        >
-          <Link href={MINISTRIES_PATH}>
-            <ArrowLeft size={16} aria-hidden='true' /> Ministries
+    <DashboardPage>
+      <header className="relative isolate overflow-hidden border border-border bg-card">
+        <div
+          className="pointer-events-none absolute inset-0 bg-brand-radial opacity-50"
+          aria-hidden
+        />
+        <div className="relative border-b border-primary/25 bg-linear-to-r from-primary/12 via-primary/5 to-transparent px-6 py-8 sm:px-8">
+          <Link
+            href={MINISTRIES_PATH}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary/80 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ArrowLeft size={16} aria-hidden />
+            Ministries
           </Link>
-        </Button>
-        <h1 className='mt-2 text-3xl font-bold text-foreground'>
-          {ministryName ?? 'Ministry members'}
-        </h1>
-        {membersState.status === 'ready' ? (
-          <p className='mt-1 text-muted-foreground'>
-            {formatMemberCount(membersState.data.members.length)} ·{' '}
-            {membersState.leader ? (
-              <>
-                Led by{' '}
-                <span className='font-semibold text-foreground'>
-                  {getFullName(membersState.leader)}
-                </span>
-              </>
-            ) : (
-              'No leader yet'
-            )}
+          <p className="mt-4 text-xs font-semibold tracking-widest text-primary uppercase">
+            Members
           </p>
-        ) : null}
-        {membersState.status === 'ready' && isYearClosedForManagers ? (
-          <p className='mt-1 text-sm text-muted-foreground'>
-            The fellowship year is closed, so members can&apos;t be added or
-            removed.
-          </p>
-        ) : null}
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            {ministryName ?? 'Ministry members'}
+          </h1>
+          {membersState.status === 'ready' ? (
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
+              {formatMemberCount(memberCount)} in this ministry
+              {leader ? (
+                <>
+                  {' '}
+                  · Led by{' '}
+                  <span className="font-semibold text-foreground">
+                    {getFullName(leader)}
+                  </span>
+                </>
+              ) : (
+                <> · No leader appointed yet</>
+              )}
+              .
+            </p>
+          ) : null}
+          {membersState.status === 'ready' && isYearClosedForManagers ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              The fellowship year is closed, so members can&apos;t be added or
+              removed.
+            </p>
+          ) : null}
+        </div>
       </header>
 
+      {membersState.status === 'ready' ? (
+        <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+          <SummaryStat
+            icon={UsersRound}
+            label="Members"
+            value={String(memberCount)}
+            hint={formatMemberCount(memberCount)}
+          />
+          <SummaryStat
+            icon={Crown}
+            label="Ministry leader"
+            value={leader ? getFullName(leader) : 'Vacant'}
+            hint={
+              leader
+                ? `${leader.fellowshipId} · since ${sinceFormat.format(new Date(leader.since))}`
+                : 'Appoint from the ministries list'
+            }
+          />
+        </div>
+      ) : null}
+
       {membersState.status === 'loading' ? (
-        <p
-          role='status'
-          className='text-sm font-semibold text-muted-foreground'
-        >
-          Loading members...
-        </p>
+        <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3" role="status">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <MemberCardSkeleton key={index} />
+          ))}
+          <span className="sr-only">Loading members…</span>
+        </div>
       ) : null}
 
       {membersState.status === 'not_found' ? (
-        <Card className='p-6 shadow-none'>
-          <p className='font-bold text-foreground'>
-            We couldn&apos;t find that ministry.
-          </p>
-          <p className='mt-1 text-sm text-muted-foreground'>
-            Choose a ministry from the list.
-          </p>
-          <Button asChild size='sm' className='mt-4'>
-            <Link href={MINISTRIES_PATH}>Back to ministries</Link>
-          </Button>
+        <Card className={cn('relative overflow-hidden p-6', dashboardCardClassName)}>
+          <div
+            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
+            aria-hidden
+          />
+          <div className="relative">
+            <p className="font-bold text-foreground">
+              We couldn&apos;t find that ministry.
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Choose a ministry from the list.
+            </p>
+            <Button asChild size="sm" className="mt-4">
+              <Link href={MINISTRIES_PATH}>Back to ministries</Link>
+            </Button>
+          </div>
         </Card>
       ) : null}
 
       {membersState.status === 'error' ? (
-        <Card role='alert' className='p-6 shadow-none'>
-          <p className='font-bold text-foreground'>
-            We couldn&apos;t load the members.
-          </p>
-          <p className='mt-1 text-sm text-muted-foreground'>
-            {membersState.message}
-          </p>
-          <Button
-            type='button'
-            size='sm'
-            className='mt-4'
-            onClick={handleRetry}
-          >
-            Try again
-          </Button>
+        <Card
+          role="alert"
+          className={cn('relative overflow-hidden p-6', dashboardCardClassName)}
+        >
+          <div
+            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
+            aria-hidden
+          />
+          <div className="relative">
+            <p className="font-bold text-foreground">
+              We couldn&apos;t load the members.
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {membersState.message}
+            </p>
+            <Button type="button" size="sm" className="mt-4" onClick={handleRetry}>
+              Try again
+            </Button>
+          </div>
         </Card>
       ) : null}
 
       {membersState.status === 'ready' &&
       canManage &&
-      canLookupMember(actor) ? (
-        <Card className='p-6 shadow-none'>
-          <h2 className='text-lg font-bold text-foreground'>Add a member</h2>
-          <p className='mt-1 text-sm text-muted-foreground'>
-            The member must be an Active Member who has finished onboarding.
-          </p>
-          <form
-            noValidate
-            onSubmit={handleAddSubmit}
-            className='mt-4 flex flex-wrap items-start gap-3'
-          >
-            <div className='min-w-48 flex-1'>
-              <FellowshipIdField
-                id={ADD_INPUT_ID}
-                value={fellowshipId}
-                error={addError}
-                disabled={isWorking || isLookingUp}
-                onValueChange={(value) => {
-                  setFellowshipId(value);
-                  if (addError) setAddError(null);
-                }}
-              />
+      canLookupMember(actor) &&
+      !isYearClosedForManagers ? (
+        <Card className={cn('relative overflow-hidden p-6', dashboardCardClassName)}>
+          <div
+            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-25"
+            aria-hidden
+          />
+          <div className="relative">
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+                <UserPlus size={20} aria-hidden />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-foreground">Add a member</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  The member must be an Active Member who has finished onboarding.
+                </p>
+              </div>
             </div>
-            <Button
-              type='submit'
-              className='sm:mt-7'
-              disabled={isWorking || isLookingUp}
+            <form
+              noValidate
+              onSubmit={handleAddSubmit}
+              className="mt-5 flex flex-wrap items-start gap-3 border-t border-border pt-5"
             >
-              {isLookingUp ? 'Checking...' : 'Add member'}
-            </Button>
-          </form>
+              <div className="min-w-48 flex-1">
+                <FellowshipIdField
+                  id={ADD_INPUT_ID}
+                  value={fellowshipId}
+                  error={addError}
+                  disabled={isWorking || isLookingUp}
+                  onValueChange={(value) => {
+                    setFellowshipId(value);
+                    if (addError) setAddError(null);
+                  }}
+                />
+              </div>
+              <Button
+                type="submit"
+                className="sm:mt-7"
+                disabled={isWorking || isLookingUp}
+              >
+                {isLookingUp ? 'Checking...' : 'Add member'}
+              </Button>
+            </form>
+          </div>
         </Card>
       ) : null}
 
       {membersState.status === 'ready' ? (
-        <Card className='px-6 py-2 shadow-none'>
-          {membersState.data.members.length === 0 ? (
-            <p className='py-4 text-muted-foreground'>
-              No one is in this ministry yet.
+        <section aria-labelledby="members-grid-heading">
+          <div className="mb-4">
+            <h2 id="members-grid-heading" className="text-lg font-bold text-foreground">
+              Roster
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Everyone currently serving in {ministryName}.
             </p>
+          </div>
+
+          {membersState.data.members.length === 0 ? (
+            <Card className={cn('p-6', dashboardCardClassName)}>
+              <p className="text-muted-foreground">
+                No one is in this ministry yet. When you add members, they will
+                appear here.
+              </p>
+            </Card>
           ) : (
-            <ul className='divide-y divide-slate-200'>
+            <ul className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {membersState.data.members.map((member) => {
                 const isLeader =
                   member.personId === membersState.leader?.personId;
                 return (
-                  <li
-                    key={member.personId}
-                    className='flex flex-wrap items-center justify-between gap-3 py-4'
-                  >
-                    <div className='min-w-0'>
-                      <p className='font-bold text-foreground'>
-                        {getFullName(member)}
+                  <li key={member.personId}>
+                    <Card
+                      className={cn(
+                        'flex h-full flex-col p-5 transition-colors',
+                        dashboardCardClassName,
+                        isLeader
+                          ? 'border-primary/35 bg-primary/5'
+                          : 'hover:border-primary/30 hover:bg-primary/5',
+                      )}
+                    >
+                      <div className="mb-3 h-0.5 w-10 bg-primary" aria-hidden />
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <p className="font-bold text-foreground">
+                          {getFullName(member)}
+                        </p>
                         {isLeader ? (
-                          <span className='ml-2 text-sm font-semibold text-primary'>
+                          <span className="shrink-0 bg-primary px-2 py-0.5 text-[0.625rem] font-semibold tracking-widest text-primary-foreground uppercase">
                             Leader
                           </span>
                         ) : null}
-                      </p>
-                      <p className='text-sm text-muted-foreground'>
+                      </div>
+                      <p className="mt-2 text-sm text-muted-foreground">
                         {member.fellowshipId} · since{' '}
                         {sinceFormat.format(new Date(member.since))}
                       </p>
-                    </div>
-                    {canManage && !isLeader ? (
-                      <Button
-                        type='button'
-                        variant='ghost'
-                        size='sm'
-                        className='text-destructive hover:text-destructive/80'
-                        disabled={isWorking}
-                        onClick={() =>
-                          setPendingAction({ type: 'remove', member })
-                        }
-                      >
-                        Remove
-                      </Button>
-                    ) : null}
+                      {canManage && !isLeader && !isYearClosedForManagers ? (
+                        <div className="mt-4 border-t border-border pt-3">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="normal-case tracking-normal text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            disabled={isWorking}
+                            onClick={() =>
+                              setPendingAction({ type: 'remove', member })
+                            }
+                          >
+                            Remove from ministry
+                          </Button>
+                        </div>
+                      ) : null}
+                    </Card>
                   </li>
                 );
               })}
             </ul>
           )}
-        </Card>
+        </section>
       ) : null}
 
       <AlertDialog
@@ -426,7 +552,7 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
               </AlertDialogTitle>
               <AlertDialogDescription>
                 Add{' '}
-                <strong className='font-bold text-foreground'>
+                <strong className="font-bold text-foreground">
                   {getFullName(pendingAction.member)}
                 </strong>{' '}
                 ({pendingAction.member.fellowshipId}) to {ministryName}? Check
@@ -449,8 +575,8 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isWorking}>Cancel</AlertDialogCancel>
               <Button
-                type='button'
-                size='sm'
+                type="button"
+                size="sm"
                 className={
                   pendingAction.type === 'remove'
                     ? 'bg-red-600 hover:bg-red-700'
@@ -471,6 +597,6 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
           ) : null}
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </DashboardPage>
   );
 }

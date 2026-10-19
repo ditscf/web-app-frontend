@@ -13,7 +13,7 @@ export function Events() {
   return (
     <section
       id='events'
-      className='overflow-hidden bg-sidebar py-24 text-sidebar-foreground'
+      className='overflow-hidden bg-sidebar py-20 text-sidebar-foreground'
     >
       <div className='mx-auto w-full max-w-6xl px-4'>
         <SectionHeader
@@ -22,7 +22,7 @@ export function Events() {
           title='Moments that become spiritual milestones.'
           text='From worship nights to outreach missions, DITSCF programs are designed to form believers and impact communities.'
         />
-        <div className='mt-14 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]'>
+        <div className='mt-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]'>
           <div className='relative min-h-[520px] overflow-hidden shadow-lg'>
             <Image
               src={featuredEvent.image}
@@ -36,7 +36,7 @@ export function Events() {
               <Badge className='bg-primary px-2 py-0.5 text-primary-foreground'>
                 Featured Event
               </Badge>
-              <h3 className='mt-5 text-4xl font-bold'>{featuredEvent.title}</h3>
+              <h3 className='mt-4 text-3xl font-bold leading-tight'>{featuredEvent.title}</h3>
               <p className='mt-4 max-w-xl leading-7 text-sidebar-foreground/72'>
                 {featuredEvent.description}
               </p>
