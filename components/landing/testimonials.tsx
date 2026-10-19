@@ -8,18 +8,28 @@ import { testimonials } from '@/lib/site-content';
 
 export function Testimonials() {
   return (
-    <section className="bg-slate-50 py-24">
-      <div className="section-shell">
-        <SectionHeader center eyebrow="Testimonials" title="Stories from students and associates." />
-        <div className="mt-14 grid gap-5 lg:grid-cols-3">
+    <section className='bg-muted py-24'>
+      <div className='mx-auto w-full max-w-6xl px-4'>
+        <SectionHeader
+          center
+          eyebrow='Testimonials'
+          title='Stories from students and associates.'
+        />
+        <div className='mt-14 grid gap-5 lg:grid-cols-3'>
           {testimonials.map((item) => (
-            <Card key={item.name} className="rounded-4xl p-7">
-              <MessageCircleHeart className="text-gold" size={34} />
-              <p className="mt-6 text-lg leading-8 text-slate-700">“{item.quote}”</p>
-              <Separator className="mt-7" />
-              <div className="pt-5">
-                <strong className="block text-navy">{item.name}</strong>
-                <span className="text-sm font-semibold text-slate-500">{item.role}</span>
+            <Card key={item.name} className='p-7'>
+              <span className='grid size-12 place-items-center bg-primary/20 text-primary'>
+                <MessageCircleHeart size={22} />
+              </span>
+              <p className='mt-6 text-lg leading-8 text-foreground'>
+                “{item.quote}”
+              </p>
+              <Separator className='mt-7' />
+              <div className='pt-5'>
+                <strong className='block text-foreground'>{item.name}</strong>
+                <span className='text-sm font-semibold text-muted-foreground'>
+                  {item.role}
+                </span>
               </div>
             </Card>
           ))}

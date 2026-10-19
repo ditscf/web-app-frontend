@@ -14,16 +14,36 @@ Each step follows the same loop: inspect, make the smallest change, verify, repo
 | Visibility rules, no-access state, nav driven by rules | `docs/design/access-and-dashboard.md` |
 | Public sign-up wired to the API | `components/auth/sign-up-form.tsx` |
 | Applications queue with the two approval steps | `components/applications/applications-review.tsx` |
+| GS-assisted registration on the applications page | `docs/design/assisted-registration.md` |
 | Onboarding gate and ministry selection | `components/onboarding/` |
 | Home page with "Needs your attention" | `components/dashboard/needs-attention.tsx` |
 | My profile and email change | `docs/design/profile.md` |
 | Ministries, leaders, and ministry members | `docs/design/ministries.md` |
 | Home count of ministries without a leader | `docs/design/access-and-dashboard.md` |
+| My ministries links and Fellowship ID lookup before appoint/add | `docs/design/ministries.md` |
 | UI stack: Tailwind CSS v4, shadcn on Radix instead of Base UI, stock styling | `docs/design/ui-components.md` |
 
 ## Next
 
-Nothing is unblocked. Every remaining module waits for a backend endpoint (see "Blocked" below), and the backend requests from the last phase are still open. The next frontend phase starts when the backend ships its next step; its plan is written here first, as for the phase below.
+Nothing is unblocked. Every remaining module waits for a backend endpoint (see "Blocked" below). The next frontend phase starts when the backend ships its next step (Events); its plan is written here first.
+
+## Phase record: GS-assisted registration (done 2026-10-19)
+
+Consumed the assisted-registration piece of backend step 3. Decisions: form on `/dashboard/applications` via a top-right button; show "Registered by GS" in the queue; no home shortcut. Requirement docs synced from the backend.
+
+### Contracts added
+
+| Endpoint | Who | Responses |
+| --- | --- | --- |
+| `POST /v1/applications/assisted` | GS, year OPEN | Same body and result shape as public sign-up. Stores `GS_ASSISTED`; counts as the GS step |
+| `GET /v1/applications/list` (extended) | GS or VGS | Each pending row includes `submissionSource` and `gsApprovalRecorded` (true for assisted without a GS decision row) |
+
+### Steps
+
+1. Foundation: `canRegisterAssisted`, `registerAssistedApplication`, pending schema `submissionSource`.
+2. Queue: label and status copy for assisted rows; GS has no Approve on those rows.
+3. Form: "Register a member" on the applications page.
+4. Docs: `docs/design/assisted-registration.md`, access table, this roadmap.
 
 ## Phase record: member profile and ministries (done 2026-10-05)
 
@@ -39,15 +59,17 @@ Verified against the backend source on 2026-10-05. Full response shapes are in t
 | `PATCH /v1/profile/update` | The member (Active) | Any of `firstName`, `lastName`, `phone`, `class`, `course`, `yearOfStudy`; returns the profile. `400` for an empty body, an empty field, or any other field (`email`, `dateOfBirth`, `fellowshipId` are refused) |
 | `POST /v1/profile/email/request` | The member (Active) | `{ newEmail }`; returns `{ message, expiresAt }`. `400` invalid or same email, `409` email in use, `429` too many requests in an hour, `503` the code email could not be sent |
 | `POST /v1/profile/email/confirm` | The member (Active) | `{ code }` (6 digits); returns the profile. `400` wrong or expired code (the request ends after too many attempts), `409` the email was taken meanwhile |
+| `GET /v1/ministries/mine` | The member (onboarded) | Current ministries: `{ ministries: [{ ministry, since }] }`. Uses `member.viewOwn` |
 | `GET /v1/ministries/leaders` | Any onboarded member | `{ operativeYear, ministries: [{ ministry, leader \| null }] }`. Leader: `personId`, `fellowshipId`, `firstName`, `lastName`, `since` |
 | `POST /v1/ministries/:ministryId/leader` | Chairman, year OPEN | `{ fellowshipId }`; returns `{ ministry, fellowshipYear, leader, replaced \| null, joinedMinistry }`. `404` ministry or Fellowship ID, `400` not an Active Member, `409` already leads this or another ministry this year, not onboarded, or a concurrent change |
 | `GET /v1/ministries/:ministryId/members/list` | Chairman, that ministry's current-year leader, or a member of that ministry; year OPEN or CLOSED | `{ ministry, members: [person] }`, ordered by last name. `403` anyone else, `404` unknown ministry |
 | `POST /v1/ministries/:ministryId/members/add` | Chairman or that ministry's current-year leader, year OPEN | `{ fellowshipId }`; `201` with `{ ministry, member }`. `404`, `400` not Active, `409` not onboarded or already a member |
 | `POST /v1/ministries/:ministryId/members/remove` | Same as add | `{ fellowshipId }`; `200` with `{ ministry, member, removedAt }`. `404` unknown, or not in the ministry; `409` the member is that ministry's current leader |
+| `GET /v1/members/lookup/:fellowshipId` | Chairman, GS, VGS, or a Ministry Leader; year OPEN or CLOSED | `{ personId, fellowshipId, firstName, lastName, membershipStatus, onboarded }`. `400` malformed ID, `404` unknown |
 
 Facts that shape the UI:
 
-- Fellowship IDs are 8 digits. Appointing a leader and adding or removing a member identify the person by Fellowship ID only; there is no member search or lookup.
+- Fellowship IDs are 8 digits. Appointing a leader and adding a member identify the person by Fellowship ID; `GET /v1/members/lookup/:fellowshipId` confirms the name before the action.
 - Leaders are never removed, only replaced. One person leads at most one ministry per year.
 - A Ministry Leader sees and manages members only in the ministry they lead; the Chairman in every ministry (changed 2026-10-05, see "Rule changes after testing").
 - Appointing a leader makes them a member of that ministry. A replaced leader stays a member. The current leader cannot be removed from their ministry.
@@ -65,8 +87,10 @@ In `lib/auth/access.ts`, each naming the policy action it mirrors. All of them r
 | `canAppointMinistryLeaders` | `ministry.appointLeader` | Year `OPEN` and Chairman |
 | `canManageMinistryMembers(actor, ministryId)` | `ministry.manageMembership` | Year `OPEN` and (Chairman or leads that ministry) |
 | `canOverseeMinistryMembers(actor, ministryId)` | `ministry.viewMembership` | An operative year and (Chairman or leads that ministry) |
+| `canViewMinistryMembers(actor, ministryId, ownMinistryIds)` | `ministry.viewMembership` plus `/ministries/mine` | Oversee, or the ministry is in the caller's own ministries |
+| `canLookupMember(actor)` | `member.lookup` | An operative year and (Chairman, GS, VGS, or leads a ministry) |
 
-`ministry.viewMembership` also allows current members of that ministry. `/auth/me` does not say which ministries a member belongs to, so the frontend cannot show that link to them (see decisions below). A direct visit still works, because the API decides.
+`ministry.viewMembership` also allows current members of that ministry. The ministries page loads `GET /v1/ministries/mine` for those links. A direct visit still works, because the API decides.
 
 ### Steps
 
@@ -114,8 +138,8 @@ In `lib/auth/access.ts`, each naming the policy action it mirrors. All of them r
 
 ### Decisions (approved 2026-10-05)
 
-1. **"My ministries" for ordinary members: ask the backend.** No endpoint returns the ministries a member belongs to, and `/auth/me` does not include them, so an ordinary member cannot be shown a link to their own ministry's member list. The backend is asked for a "my ministries" endpoint or a field on `/auth/me`. Until it exists, ordinary members see the ministries and leaders page only.
-2. **Fellowship ID without a preview: build with mitigations.** The API cannot show whose ID it is before appointing or adding, so a mistyped ID acts on the wrong person. The confirmation dialog repeats the ID, and the result names the person; a wrong leader can be replaced and a wrong member removed. A lookup by Fellowship ID is a later backend request.
+1. **"My ministries" for ordinary members.** Done: `GET /v1/ministries/mine`. The ministries page links each of the caller's ministries to its member list while there is an operative year.
+2. **Fellowship ID lookup before appoint/add.** Done: `GET /v1/members/lookup/:fellowshipId`. Appoint and add look up the name first; not Active or not onboarded is refused under the field before confirm.
 3. **Profile values outside the option lists: keep the current value.** Some local profiles hold values that are not in the sign-up lists (for example "Bachelor Degree" instead of "Bachelor's Degree"). The edit form uses the sign-up lists, and an unlisted stored value is shown as the current choice, so saving other fields does not force a change.
 4. **Test accounts: a Chairman inbox the project owner controls.** Done by the project owner: the Chairman (`25140001`) now uses `vicoba.sgiafrica@gmail.com` and has onboarded; the Vice General Secretary moved to `vicoba2.sgiafrica@gmail.com`. The Ministry Leader flows were tested with Ev. Johnson Rutabangwa (`25140006`, Evangelists); see `docs/design/ministries.md`.
 5. **Home item: yes.** Step 6 adds "N ministries have no leader this year" for the Chairman while the year is OPEN, from `GET /v1/ministries/leaders`, hidden when zero or on error.
@@ -128,10 +152,13 @@ Testing Step 5 showed that any Ministry Leader could manage every ministry, as t
 - Appointing a leader makes them a member of that ministry (`joinedMinistry` in the response). The appointee must have finished onboarding. A replaced leader stays a member, and the current leader cannot be removed (`409`).
 - Frontend: the ministry rules in `lib/auth/access.ts` take a `ministryId`; the member page shows the leader and hides Remove on their row; the appoint toast says when the leader joined the ministry.
 
-### Backend requests
+### Follow-up: my ministries and lookup (done 2026-10-06)
 
-- A "my ministries" endpoint, or the member's current ministries on `/auth/me` (decision 1).
-- Later: a lookup that returns a member's name by Fellowship ID, for officers and leaders before they appoint or add (decision 2).
+Backend shipped `GET /v1/ministries/mine` and `GET /v1/members/lookup/:fellowshipId`. Frontend:
+
+- Loads own ministries on the ministries page for member-list links (`canViewMinistryMembers`).
+- Looks up the member before appointing a leader or adding a member; confirm dialogs name them.
+- Access rules: `canViewMinistryMembers`, `canLookupMember` in `lib/auth/access.ts`; API helpers in `lib/api/ministries.ts` and `lib/api/members.ts`.
 
 ### Known limitations of this phase
 
@@ -144,7 +171,7 @@ In the backend's build order:
 1. **Events**: Chairman creates events and appoints committees; Event Chairman, Treasurer, and Secretary pages; close; Vice Chairman correction and archive.
 2. **Fellowship year closure and archive**: General Secretary request with a 12-hour window, Chairman confirmation, archive.
 3. **Graduation**: Event Chairman request, Chairman confirmation.
-4. **Member access views**: my ministries, my events, CLOSED and ARCHIVED records (archived years only, after onboarding; the current CLOSED year read-only).
+4. **Member access views**: my events, CLOSED and ARCHIVED records (archived years only, after onboarding; the current CLOSED year read-only). My ministries was done with ministry membership.
 
 ## Later
 

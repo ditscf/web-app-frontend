@@ -1,18 +1,40 @@
 'use client';
 
-import { ArrowLeft, ArrowRight, Check, PencilLine } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarIcon, Check, PencilLine } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect, useState, type ComponentProps, type FormEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useState,
+  type ComponentProps,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 import { toast } from 'sonner';
 import { AuthCard } from '@/components/auth/auth-card';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { registerApplication } from '@/lib/api/applications';
 import { getUserFacingMessage, toApiError } from '@/lib/api/errors';
-import { getCoursesForStudyClass, studyClasses, yearsOfStudy } from '@/lib/onboarding-options';
+import {
+  getCoursesForStudyClass,
+  studyClasses,
+  yearsOfStudy,
+} from '@/lib/onboarding-options';
 import { cn } from '@/lib/utils';
 import { isValidEmail, isValidPhone } from '@/lib/validation';
 
@@ -70,7 +92,8 @@ const STEPS: readonly StepConfig[] = [
     id: 'review',
     eyebrow: 'Review',
     title: 'Check your details.',
-    description: 'Make sure everything is correct before you submit your application.',
+    description:
+      'Make sure everything is correct before you submit your application.',
     fields: [],
     focusId: null,
   },
@@ -93,20 +116,41 @@ const INITIAL_DATA: SignUpData = {
 const NAME_MAX_LENGTH = 80;
 const PHONE_MAX_LENGTH = 32;
 
-const INPUT_CLASS = 'placeholder:font-semibold placeholder:text-slate-400';
+const INPUT_CLASS =
+  'placeholder:font-semibold placeholder:text-muted-foreground';
 
 function getTodayIsoDate(): string {
   const now = new Date();
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
+    .toISOString()
+    .slice(0, 10);
+}
+
+function parseIsoDate(isoDate: string): Date | undefined {
+  if (!isoDate) return undefined;
+  const [year, month, day] = isoDate.split('-').map(Number);
+  if (!year || !month || !day) return undefined;
+  return new Date(year, month - 1, day);
+}
+
+function toIsoDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function formatDate(isoDate: string): string {
-  return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(
-    new Date(`${isoDate}T00:00:00Z`),
-  );
+  return new Intl.DateTimeFormat('en-GB', {
+    dateStyle: 'long',
+    timeZone: 'UTC',
+  }).format(new Date(`${isoDate}T00:00:00Z`));
 }
 
-function getFieldError(field: SignUpField, data: SignUpData): string | undefined {
+function getFieldError(
+  field: SignUpField,
+  data: SignUpData,
+): string | undefined {
   switch (field) {
     case 'firstName':
       return data.firstName ? undefined : 'Enter your first name.';
@@ -114,13 +158,19 @@ function getFieldError(field: SignUpField, data: SignUpData): string | undefined
       return data.lastName ? undefined : 'Enter your last name.';
     case 'dateOfBirth':
       if (!data.dateOfBirth) return 'Enter your date of birth.';
-      return data.dateOfBirth > getTodayIsoDate() ? "Date of birth can't be in the future." : undefined;
+      return data.dateOfBirth > getTodayIsoDate()
+        ? "Date of birth can't be in the future."
+        : undefined;
     case 'email':
       if (!data.email) return 'Enter your email address.';
-      return isValidEmail(data.email) ? undefined : 'Enter a valid email address, like name@example.com.';
+      return isValidEmail(data.email)
+        ? undefined
+        : 'Enter a valid email address, like name@example.com.';
     case 'phone':
       if (!data.phone) return 'Enter your phone number.';
-      return isValidPhone(data.phone) ? undefined : 'Enter a valid phone number, like +255 745 000 000.';
+      return isValidPhone(data.phone)
+        ? undefined
+        : 'Enter a valid phone number, like +255 745 000 000.';
     case 'studyClass':
       return data.studyClass ? undefined : 'Choose your class.';
     case 'course':
@@ -163,18 +213,25 @@ export function SignUpForm() {
     if (step.focusId) document.getElementById(step.focusId)?.focus();
   }, [step.focusId]);
 
-  function updateField<Field extends SignUpField>(field: Field, value: SignUpData[Field]) {
+  function updateField<Field extends SignUpField>(
+    field: Field,
+    value: SignUpData[Field],
+  ) {
     setData((current) => ({ ...current, [field]: value }));
-    if (errors[field]) setErrors((current) => ({ ...current, [field]: undefined }));
+    if (errors[field])
+      setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
   function handleStudyClassChange(studyClass: string) {
     setData((current) => ({
       ...current,
       studyClass,
-      course: getCoursesForStudyClass(studyClass).includes(current.course) ? current.course : '',
+      course: getCoursesForStudyClass(studyClass).includes(current.course)
+        ? current.course
+        : '',
     }));
-    if (errors.studyClass) setErrors((current) => ({ ...current, studyClass: undefined }));
+    if (errors.studyClass)
+      setErrors((current) => ({ ...current, studyClass: undefined }));
   }
 
   function goToStep(index: number) {
@@ -200,7 +257,10 @@ export function SignUpForm() {
       await registerApplication(data);
     } catch (error) {
       const apiError = toApiError(error);
-      const description = apiError.kind === 'validation' ? apiError.messages.join(' ') : getUserFacingMessage(error);
+      const description =
+        apiError.kind === 'validation'
+          ? apiError.messages.join(' ')
+          : getUserFacingMessage(error);
       toast.error("We couldn't submit your application", { description });
       return;
     } finally {
@@ -209,7 +269,8 @@ export function SignUpForm() {
 
     setIsSubmitted(true);
     toast.success('Application received', {
-      description: "Your application is under review. We'll email you once it's accepted.",
+      description:
+        "Your application is under review. We'll email you once it's accepted.",
     });
   }
 
@@ -245,7 +306,7 @@ export function SignUpForm() {
   }
 
   return (
-    <div className="w-full max-w-lg">
+    <div className='w-full max-w-lg'>
       <StepProgress currentIndex={stepIndex} />
       <motion.div
         key={step.id}
@@ -253,41 +314,45 @@ export function SignUpForm() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
       >
-        <AuthCard eyebrow={step.eyebrow} title={step.title} description={step.description}>
-          <form noValidate onSubmit={handleSubmit} className="space-y-5">
+        <AuthCard
+          eyebrow={step.eyebrow}
+          title={step.title}
+          description={step.description}
+        >
+          <form noValidate onSubmit={handleSubmit} className='space-y-5'>
             {step.id === 'basic' ? (
               <>
-                <div className="grid gap-5 sm:grid-cols-2">
+                <div className='grid gap-5 sm:grid-cols-2'>
                   <TextField
-                    field="firstName"
-                    label="First name"
+                    field='firstName'
+                    label='First name'
                     error={errors.firstName}
-                    autoComplete="given-name"
+                    autoComplete='given-name'
                     maxLength={NAME_MAX_LENGTH}
-                    placeholder="Johnson"
+                    placeholder='Johnson'
                     value={data.firstName}
-                    onChange={(event) => updateField('firstName', event.target.value)}
+                    onChange={(event) =>
+                      updateField('firstName', event.target.value)
+                    }
                   />
                   <TextField
-                    field="lastName"
-                    label="Last name"
+                    field='lastName'
+                    label='Last name'
                     error={errors.lastName}
-                    autoComplete="family-name"
+                    autoComplete='family-name'
                     maxLength={NAME_MAX_LENGTH}
-                    placeholder="Rutabangwa"
+                    placeholder='Rutabangwa'
                     value={data.lastName}
-                    onChange={(event) => updateField('lastName', event.target.value)}
+                    onChange={(event) =>
+                      updateField('lastName', event.target.value)
+                    }
                   />
                 </div>
-                <TextField
-                  field="dateOfBirth"
-                  label="Date of birth"
-                  error={errors.dateOfBirth}
-                  type="date"
-                  autoComplete="bday"
-                  className={cn(!data.dateOfBirth && 'font-semibold text-slate-400')}
+                <DateOfBirthField
                   value={data.dateOfBirth}
-                  onChange={(event) => updateField('dateOfBirth', event.target.value)}
+                  error={errors.dateOfBirth}
+                  disabled={isLocked}
+                  onChange={(value) => updateField('dateOfBirth', value)}
                 />
               </>
             ) : null}
@@ -295,25 +360,25 @@ export function SignUpForm() {
             {step.id === 'contact' ? (
               <>
                 <TextField
-                  field="email"
-                  label="Email address"
+                  field='email'
+                  label='Email address'
                   error={errors.email}
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
+                  type='email'
+                  inputMode='email'
+                  autoComplete='email'
+                  placeholder='you@example.com'
                   value={data.email}
                   onChange={(event) => updateField('email', event.target.value)}
                 />
                 <TextField
-                  field="phone"
-                  label="Phone number"
+                  field='phone'
+                  label='Phone number'
                   error={errors.phone}
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
+                  type='tel'
+                  inputMode='tel'
+                  autoComplete='tel'
                   maxLength={PHONE_MAX_LENGTH}
-                  placeholder="+255 745 123 607"
+                  placeholder='+255 745 123 607'
                   value={data.phone}
                   onChange={(event) => updateField('phone', event.target.value)}
                 />
@@ -322,17 +387,21 @@ export function SignUpForm() {
 
             {step.id === 'education' ? (
               <>
-                <FormField id="studyClass" label="Class" error={errors.studyClass}>
+                <FormField
+                  id='studyClass'
+                  label='Class'
+                  error={errors.studyClass}
+                >
                   <Select
-                    name="studyClass"
+                    name='studyClass'
                     value={data.studyClass}
                     onValueChange={handleStudyClassChange}
                   >
                     <SelectTrigger
-                      id="studyClass"
+                      id='studyClass'
                       {...getErrorProps('studyClass', errors.studyClass)}
                     >
-                      <SelectValue placeholder="Choose your class" />
+                      <SelectValue placeholder='Choose your class' />
                     </SelectTrigger>
                     <SelectContent>
                       {studyClasses.map((studyClass) => (
@@ -343,18 +412,24 @@ export function SignUpForm() {
                     </SelectContent>
                   </Select>
                 </FormField>
-                <FormField id="course" label="Course" error={errors.course}>
+                <FormField id='course' label='Course' error={errors.course}>
                   <Select
-                    name="course"
+                    name='course'
                     value={data.course}
                     onValueChange={(value) => updateField('course', value)}
                     disabled={!data.studyClass}
                   >
                     <SelectTrigger
-                      id="course"
+                      id='course'
                       {...getErrorProps('course', errors.course)}
                     >
-                      <SelectValue placeholder={data.studyClass ? 'Choose your course' : 'Choose your class first'} />
+                      <SelectValue
+                        placeholder={
+                          data.studyClass
+                            ? 'Choose your course'
+                            : 'Choose your class first'
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {courses.map((course) => (
@@ -365,17 +440,21 @@ export function SignUpForm() {
                     </SelectContent>
                   </Select>
                 </FormField>
-                <FormField id="yearOfStudy" label="Year of study" error={errors.yearOfStudy}>
+                <FormField
+                  id='yearOfStudy'
+                  label='Year of study'
+                  error={errors.yearOfStudy}
+                >
                   <Select
-                    name="yearOfStudy"
+                    name='yearOfStudy'
                     value={data.yearOfStudy}
                     onValueChange={(value) => updateField('yearOfStudy', value)}
                   >
                     <SelectTrigger
-                      id="yearOfStudy"
+                      id='yearOfStudy'
                       {...getErrorProps('yearOfStudy', errors.yearOfStudy)}
                     >
-                      <SelectValue placeholder="Choose an academic year" />
+                      <SelectValue placeholder='Choose an academic year' />
                     </SelectTrigger>
                     <SelectContent>
                       {yearsOfStudy.map((year) => (
@@ -390,31 +469,66 @@ export function SignUpForm() {
             ) : null}
 
             {isReviewStep ? (
-              <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200">
-                <ReviewSection title="Basic information" isEditDisabled={isLocked} onEdit={() => handleEditStep('basic')}>
-                  <ReviewItem label="First name" value={data.firstName} />
-                  <ReviewItem label="Last name" value={data.lastName} />
-                  <ReviewItem label="Date of birth" value={formatDate(data.dateOfBirth)} />
+              <div className='divide-y divide-border border border-border'>
+                <ReviewSection
+                  title='Basic information'
+                  isEditDisabled={isLocked}
+                  onEdit={() => handleEditStep('basic')}
+                >
+                  <ReviewItem label='First name' value={data.firstName} />
+                  <ReviewItem label='Last name' value={data.lastName} />
+                  <ReviewItem
+                    label='Date of birth'
+                    value={formatDate(data.dateOfBirth)}
+                  />
                 </ReviewSection>
-                <ReviewSection title="Contact details" isEditDisabled={isLocked} onEdit={() => handleEditStep('contact')}>
-                  <ReviewItem label="Email address" value={data.email} className="sm:col-span-2" valueClassName="break-all" />
-                  <ReviewItem label="Phone number" value={data.phone} />
+                <ReviewSection
+                  title='Contact details'
+                  isEditDisabled={isLocked}
+                  onEdit={() => handleEditStep('contact')}
+                >
+                  <ReviewItem
+                    label='Email address'
+                    value={data.email}
+                    className='sm:col-span-2'
+                    valueClassName='break-all'
+                  />
+                  <ReviewItem label='Phone number' value={data.phone} />
                 </ReviewSection>
-                <ReviewSection title="Education" isEditDisabled={isLocked} onEdit={() => handleEditStep('education')}>
-                  <ReviewItem label="Class" value={data.studyClass} />
-                  <ReviewItem label="Year of study" value={data.yearOfStudy} />
-                  <ReviewItem label="Course" value={data.course} className="sm:col-span-2" />
+                <ReviewSection
+                  title='Education'
+                  isEditDisabled={isLocked}
+                  onEdit={() => handleEditStep('education')}
+                >
+                  <ReviewItem label='Class' value={data.studyClass} />
+                  <ReviewItem label='Year of study' value={data.yearOfStudy} />
+                  <ReviewItem
+                    label='Course'
+                    value={data.course}
+                    className='sm:col-span-2'
+                  />
                 </ReviewSection>
               </div>
             ) : null}
 
-            <div className="flex items-center gap-3 pt-1">
+            <div className='flex items-center gap-3 pt-1'>
               {stepIndex > 0 ? (
-                <Button type="button" variant="ghost" size="lg" onClick={handleBack} disabled={isLocked}>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='lg'
+                  onClick={handleBack}
+                  disabled={isLocked}
+                >
                   <ArrowLeft size={18} /> Back
                 </Button>
               ) : null}
-              <Button type="submit" size="lg" className="flex-1" disabled={isLocked}>
+              <Button
+                type='submit'
+                size='lg'
+                className='flex-1'
+                disabled={isLocked}
+              >
                 {isReviewStep ? (
                   isSubmitted ? (
                     <>
@@ -429,16 +543,20 @@ export function SignUpForm() {
                   )
                 ) : (
                   <>
-                    {isReturningToReview ? 'Back to review' : 'Continue'} <ArrowRight size={18} />
+                    {isReturningToReview ? 'Back to review' : 'Continue'}{' '}
+                    <ArrowRight size={18} />
                   </>
                 )}
               </Button>
             </div>
           </form>
           {stepIndex === 0 ? (
-            <p className="mt-6 text-center text-sm text-slate-600">
+            <p className='mt-6 text-center text-sm text-muted-foreground'>
               Already have an account?{' '}
-              <Link href="/auth/signin" className="font-bold text-royal hover:underline">
+              <Link
+                href='/auth/signin'
+                className='font-bold text-accent hover:underline'
+              >
                 Sign in
               </Link>
             </p>
@@ -451,20 +569,22 @@ export function SignUpForm() {
 
 function StepProgress({ currentIndex }: { currentIndex: number }) {
   return (
-    <div className="mb-5">
-      <div className="flex items-center justify-between gap-3 text-sm font-semibold">
-        <p className="text-white">Create your account</p>
-        <p className="text-white/70" aria-live="polite">
+    <div className='mb-5'>
+      <div className='flex items-center justify-between gap-3 text-sm font-semibold'>
+        <p className='text-sidebar-foreground'>Create your account</p>
+        <p className='text-sidebar-foreground/70' aria-live='polite'>
           Step {currentIndex + 1} of {STEPS.length}
         </p>
       </div>
-      <div className="mt-3 flex gap-1.5" aria-hidden="true">
+      <div className='mt-3 flex gap-1.5' aria-hidden='true'>
         {STEPS.map((step, index) => (
           <span
             key={step.id}
             className={cn(
               'h-1.5 flex-1 rounded-full transition-colors duration-300',
-              index <= currentIndex ? 'bg-gold' : 'bg-white/20',
+              index <= currentIndex
+                ? 'bg-sidebar-primary'
+                : 'bg-sidebar-primary/20',
             )}
           />
         ))}
@@ -485,7 +605,7 @@ function FormField({
   children: ReactNode;
 }) {
   return (
-    <div className="space-y-2">
+    <div className='space-y-2'>
       <Label htmlFor={id}>{label}</Label>
       {children}
       <FieldError id={`${id}-error`} message={error} />
@@ -497,7 +617,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
 
   return (
-    <p id={id} role="alert" className="text-sm font-semibold text-red-600">
+    <p id={id} role='alert' className='text-sm font-semibold text-destructive'>
       {message}
     </p>
   );
@@ -527,6 +647,63 @@ function TextField({
   );
 }
 
+function DateOfBirthField({
+  value,
+  error,
+  disabled,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = parseIsoDate(value);
+
+  return (
+    <FormField id='dateOfBirth' label='Date of birth' error={error}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id='dateOfBirth'
+            type='button'
+            variant='ghost'
+            disabled={disabled}
+            {...getErrorProps('dateOfBirth', error)}
+            className={cn(
+              'h-10 w-full justify-between rounded-none border border-transparent border-b-input px-0 py-1 text-base font-normal normal-case tracking-normal hover:bg-transparent focus-visible:border-b-ring md:text-sm',
+              !value && 'font-semibold text-muted-foreground',
+              error && 'border-b-destructive',
+            )}
+          >
+            <span className='flex items-center gap-2'>
+              <CalendarIcon className='size-4 shrink-0' data-icon='inline-start' />
+              {value ? formatDate(value) : 'Pick a date'}
+            </span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className='w-auto p-0' align='start'>
+          <Calendar
+            mode='single'
+            captionLayout='dropdown'
+            selected={selected}
+            defaultMonth={selected ?? new Date(2000, 0)}
+            startMonth={new Date(1920, 0)}
+            endMonth={new Date()}
+            disabled={{ after: new Date() }}
+            onSelect={(date) => {
+              if (!date) return;
+              onChange(toIsoDate(date));
+              setOpen(false);
+            }}
+          />
+        </PopoverContent>
+      </Popover>
+    </FormField>
+  );
+}
+
 function ReviewSection({
   title,
   isEditDisabled,
@@ -539,14 +716,14 @@ function ReviewSection({
   children: ReactNode;
 }) {
   return (
-    <section className="p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-black text-navy">{title}</h2>
+    <section className='p-4 sm:p-5'>
+      <div className='flex items-center justify-between gap-3'>
+        <h2 className='text-sm font-bold text-foreground'>{title}</h2>
         <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="-mr-2 text-royal"
+          type='button'
+          variant='ghost'
+          size='sm'
+          className='-mr-2 text-accent'
           aria-label={`Edit ${title.toLowerCase()}`}
           disabled={isEditDisabled}
           onClick={onEdit}
@@ -554,7 +731,7 @@ function ReviewSection({
           <PencilLine size={14} /> Edit
         </Button>
       </div>
-      <dl className="mt-2 grid gap-x-4 gap-y-3 sm:grid-cols-2">{children}</dl>
+      <dl className='mt-2 grid gap-x-4 gap-y-3 sm:grid-cols-2'>{children}</dl>
     </section>
   );
 }
@@ -572,8 +749,15 @@ function ReviewItem({
 }) {
   return (
     <div className={className}>
-      <dt className="text-xs font-semibold text-slate-500">{label}</dt>
-      <dd className={cn('mt-0.5 wrap-break-word font-bold text-navy', valueClassName)}>{value}</dd>
+      <dt className='text-xs font-semibold text-muted-foreground'>{label}</dt>
+      <dd
+        className={cn(
+          'mt-0.5 wrap-break-word font-bold text-foreground',
+          valueClassName,
+        )}
+      >
+        {value}
+      </dd>
     </div>
   );
 }

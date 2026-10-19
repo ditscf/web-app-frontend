@@ -16,6 +16,11 @@ const pendingApplicationSchema = z.object({
   applicationId: z.string(),
   submittedAt: z.string(),
   expiresAt: z.string(),
+  submissionSource: z.enum(['SELF', 'GS_ASSISTED']),
+  /**
+   * True when the GS's participation is already satisfied: a GS decision exists, or the row is
+   * GS_ASSISTED (creating it counted as the GS step).
+   */
   gsApprovalRecorded: z.boolean(),
   applicant: z.object({
     email: z.string(),
@@ -40,10 +45,20 @@ const approvalResultSchema = z.object({
 export type PendingApplication = z.infer<typeof pendingApplicationSchema>;
 export type ApprovalResult = z.infer<typeof approvalResultSchema>;
 
-export async function registerApplication(request: RegistrationRequest): Promise<RegistrationResult> {
+function toRegistrationBody(request: RegistrationRequest) {
   const { studyClass, ...profile } = request;
   // The API rejects unknown fields and names the class field `class`.
-  const { data } = await apiClient.post('/v1/applications/new', { ...profile, class: studyClass });
+  return { ...profile, class: studyClass };
+}
+
+export async function registerApplication(request: RegistrationRequest): Promise<RegistrationResult> {
+  const { data } = await apiClient.post('/v1/applications/new', toRegistrationBody(request));
+  return parseResponse(registrationResultSchema, data);
+}
+
+/** GS only, year OPEN. Same body as self registration; counts as the GS approval step. */
+export async function registerAssistedApplication(request: RegistrationRequest): Promise<RegistrationResult> {
+  const { data } = await apiClient.post('/v1/applications/assisted', toRegistrationBody(request));
   return parseResponse(registrationResultSchema, data);
 }
 

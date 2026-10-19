@@ -140,7 +140,7 @@ export function AppointLeaderDialog({ target, yearLabel, onClose, onAppointed, o
               <>
                 <AlertDialogDescription>
                   Appoint{' '}
-                  <strong className="font-bold text-navy">
+                  <strong className="font-bold text-foreground">
                     {dialogStage.member.firstName} {dialogStage.member.lastName}
                   </strong>{' '}
                   ({dialogStage.member.fellowshipId}) as leader of {target.ministry.name} for {yearLabel}?

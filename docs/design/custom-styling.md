@@ -1,97 +1,126 @@
-# Custom Styling Still in Use
+# Custom Styling & Preset Changes
 
-The DITSCF styling that remains outside stock shadcn (see `docs/design/ui-components.md`). It is kept until the visual design is chosen; then each item is kept, moved into the shadcn theme, or removed.
+What in this frontend is **not** stock shadcn, and what to do when switching UI presets/styles.
 
-`components/ui/` uses none of it. Everything below is in `app/globals.css` and in the routes and feature components. Standard Tailwind colours such as `slate-*`, `red-*`, and `emerald-*` are not listed; they are not custom.
+Related: `docs/design/ui-components.md` (stack, brand token map, component rules).
 
-Checked on 2026-10-06.
+## Goal
 
-## Custom classes
+Prefer shadcn presets for look and feel. Feature screens should use semantic tokens (`primary`, `accent`, `sidebar`, `card`, …), not hard-coded brand colors.
 
-Defined in `app/globals.css`.
+A single CLI command that rewrites `components/ui/` and `app/globals.css` will **not** fully restyle the app until the items below are restored or removed.
 
-| Class | What it does | Used in |
+## What is custom today
+
+### 1. Brand token map (`app/globals.css` → `:root` / `.dark`)
+
+DITSCF colors are mapped onto shadcn tokens (not custom Tailwind color names like `royal` / `gold` / `navy`):
+
+| Brand role | Approx. hex | Token |
 | --- | --- | --- |
-| `glass` | Frosted glass: translucent white background, light border, 24px background blur | `components/auth/auth-card.tsx`, `components/landing/hero.tsx` |
-| `navy-grid` | Faint white grid lines drawn over a dark background | `app/auth/layout.tsx`, `components/landing/platform.tsx` |
-| `section-shell` | Centred page column, at most 1180px wide with 16px side margins | `app/auth/layout.tsx` and 13 landing components: `about`, `contact`, `events`, `footer`, `gallery`, `header`, `hero`, `impact`, `leadership`, `ministries`, `platform`, `testimonials`, `values` |
-| `mask-fade` | Fades the left and right edges to transparent | `components/landing/events.tsx` |
+| Gold CTA | `#F4B400` | `--primary` |
+| Ink on gold | navy | `--primary-foreground` |
+| Royal / links | `#0F3D91` | `--accent` |
+| Navy shells | `#07142F` | `--sidebar` |
+| Gold on navy | `#F4B400` | `--sidebar-primary` |
 
-## Custom theme tokens
+**Why:** Presets treat `--primary` as the main fill. DITSCF uses gold for buttons and navy for hero/footer/auth/dashboard chrome. Shells use `bg-sidebar`, not `bg-primary`.
 
-Defined in `@theme` in `app/globals.css`. Each one creates Tailwind classes, for example `--color-navy` creates `text-navy`, `bg-navy`, and `border-navy`.
+Documented also in `ui-components.md` → Brand token map. Comments at the top of `:root` in `globals.css` must stay.
 
-| Token | Value | Used in |
+### 2. Landing / auth CSS helpers (`app/globals.css`)
+
+| Name | Purpose | Used in |
 | --- | --- | --- |
-| `royal` colour | `#0f3d91` (blue) | See "By file" below |
-| `gold` colour | `#f4b400` | See "By file" below |
-| `navy` colour | `#07142f` (dark blue) | See "By file" below |
-| `shadow-premium` | Large soft navy shadow | `components/auth/auth-card.tsx`, `components/landing/about.tsx`, `events.tsx`, `hero.tsx`, `platform.tsx` |
-| `bg-royal-radial` | Gold and blue radial gradients | `app/auth/layout.tsx`, `components/landing/hero.tsx`, `platform.tsx` |
-| `animate-marquee` | Endless horizontal scroll (24s), switched off for users who prefer reduced motion | `components/landing/events.tsx` |
+| `.navy-grid` | Faint blueprint grid on dark shells | `components/landing/platform.tsx`, `app/auth/layout.tsx` |
+| `bg-brand-radial` (`--background-image-brand-radial`) | Soft gold + royal wash over navy | same |
+| `.mask-fade` | Fade left/right edges of the gallery strip | `components/landing/events.tsx` |
+| `animate-marquee` | Endless horizontal scroll (respects `prefers-reduced-motion`) | `components/landing/events.tsx` |
 
-## Page-wide rules
+These are **not** part of shadcn. Theme/preset rewrites that replace `globals.css` delete them unless you paste them back.
 
-Also in `app/globals.css`. These apply to every page, and several override shadcn's theme.
+### 3. Feature-level overrides (not in `components/ui/`)
 
-| Rule | Effect |
-| --- | --- |
-| `:root` `color` and `background` | Sets the text and background colour directly, outside shadcn's `--foreground` and `--background` |
-| `:root` `scroll-behavior: smooth` | Smooth scrolling for in-page links. Next.js warns about this in dev and suggests `data-scroll-behavior="smooth"` on `<html>` |
-| `body` `background` | Gold radial glow and a white-to-pale-blue gradient. Overrides shadcn's `bg-background` |
-| `body` `color` | `#0b1020`. Overrides shadcn's `text-foreground` |
-| `body` `font-family` | Inter by name, then system fonts. Overrides the `next/font` Inter set as `font-sans` in `app/layout.tsx` |
-| `body` `margin`, `min-width: 320px`, `overflow-x: hidden` | Layout defaults |
-| `::selection` | Gold highlight with navy text when selecting text |
-| `* { box-sizing: border-box }` | Already Tailwind's default, so it has no effect |
-| Border compatibility in `@layer base` | Added by the Tailwind v4 upgrade to keep v3's grey default border colour. It is followed by shadcn's own `border-border` rule |
+These stay when you reinstall UI parts; they can fight a new preset’s defaults:
 
-## Overrides on shadcn parts
+| Area | Override | File(s) |
+| --- | --- | --- |
+| Featured Event badge | Filled gold (`bg-primary px-2…`) — Sera default badge is text-only | `components/landing/events.tsx` |
+| Sign-up date of birth | Calendar + Popover trigger styled like underline `Input` | `components/auth/sign-up-form.tsx` |
+| Footer socials | Ghost, no fill, `normal-case` (Sera buttons are uppercase) | `components/landing/footer.tsx` |
+| Dashboard / forms cards | Often `shadow-none` on `Card` | dashboard, profile, ministries, applications, onboarding |
+| Landing chrome | Glass, gradients, framer-motion, navy sections | `components/landing/*`, `auth-card.tsx` |
 
-Screens pass extra classes into shadcn parts, which changes their stock look. The main ones:
+No raw hex/rgb in feature TSX; brand color comes from tokens.
 
-- **Placeholder style.** `placeholder:font-semibold placeholder:text-slate-400` on inputs in `sign-in-form.tsx`, `sign-up-form.tsx`, `email-change-card.tsx`, and `components/ministries/fellowship-id-field.tsx`.
-- **Other `className` values** on `Button`, `Input`, `Card`, `Badge`, and similar parts in most screens (sizes, rounding, colours). Files with the most: `components/ministries/ministry-members.tsx`, `components/auth/sign-up-form.tsx`, `components/profile/my-profile.tsx`.
+### 4. Small UI lock (optional note)
 
-## By file
+`components/ui/card.tsx` includes an explicit `rounded-none` so Cards stay sharp with Sera. A style reinstall may change Card again — re-check radius after switching.
 
-Custom classes and tokens each file uses.
+## What a preset / style change does
 
-| File | Uses |
-| --- | --- |
-| `app/auth/layout.tsx` | `navy-grid`, `section-shell`, `bg-royal-radial`, royal, gold, navy |
-| `components/applications/applications-review.tsx` | navy |
-| `components/auth/auth-card.tsx` | `glass`, `shadow-premium`, royal, navy |
-| `components/auth/current-actor-provider.tsx` | navy |
-| `components/auth/sign-in-form.tsx` | royal, gold, navy |
-| `components/auth/sign-up-form.tsx` | royal, gold, navy |
-| `components/dashboard/home-overview.tsx` | navy |
-| `components/dashboard/needs-attention.tsx` | royal, gold, navy |
-| `components/dashboard/no-access.tsx` | navy |
-| `components/dashboard/sidebar.tsx` | royal, gold, navy |
-| `components/landing/about.tsx` | `section-shell`, `shadow-premium`, royal, navy |
-| `components/landing/contact.tsx` | `section-shell`, royal |
-| `components/landing/events.tsx` | `section-shell`, `mask-fade`, `animate-marquee`, `shadow-premium`, gold, navy |
-| `components/landing/footer.tsx` | `section-shell`, gold, navy |
-| `components/landing/gallery.tsx` | `section-shell`, royal, gold, navy |
-| `components/landing/header.tsx` | `section-shell`, gold, navy |
-| `components/landing/hero.tsx` | `glass`, `section-shell`, `bg-royal-radial`, `shadow-premium`, royal, gold, navy |
-| `components/landing/impact.tsx` | `section-shell`, royal |
-| `components/landing/leadership.tsx` | `section-shell`, royal |
-| `components/landing/ministries.tsx` | `section-shell`, royal |
-| `components/landing/platform.tsx` | `navy-grid`, `section-shell`, `bg-royal-radial`, `shadow-premium`, royal, gold, navy |
-| `components/landing/section-header.tsx` | gold, navy |
-| `components/landing/testimonials.tsx` | `section-shell`, gold, navy |
-| `components/landing/values.tsx` | `section-shell`, royal, gold |
-| `components/ministries/appoint-leader-dialog.tsx` | navy |
-| `components/ministries/ministries-overview.tsx` | royal, gold, navy |
-| `components/ministries/ministry-members.tsx` | royal, navy |
-| `components/onboarding/onboarding-form.tsx` | royal, gold, navy |
-| `components/profile/email-change-card.tsx` | royal, gold, navy |
-| `components/profile/my-profile.tsx` | royal, navy |
-
-## Finding it again
+Typical command (style name varies):
 
 ```bash
-rg "glass|navy-grid|section-shell|mask-fade|animate-marquee|bg-royal-radial|shadow-premium|-royal|-gold|-navy" app components --glob '!components/ui/**'
+npx shadcn@latest init -b radix -p <style> -f --reinstall
 ```
+
+Or theme/preset flows that rewrite `app/globals.css`.
+
+| Touched | Effect |
+| --- | --- |
+| `components/ui/*` | Replaced with the new style (Button, Card, Input, …) |
+| `app/globals.css` | Often overwritten — brand map + landing helpers **lost** |
+| `app/layout.tsx` font | May be reset |
+| Feature screens (`components/landing/*`, etc.) | **Not** rewritten — still use your classNames and token roles |
+
+## Checklist: changing presets
+
+Do this every time you switch style or apply a theme that rewrites CSS.
+
+1. **Run the shadcn command** for the new style/preset (see CLI docs for the current flags).
+2. **Typecheck** — prop/API differences in UI parts can break screens:
+   ```bash
+   npx tsc --noEmit
+   ```
+3. **Restore brand tokens** in `app/globals.css` `:root` and `.dark` (table above + comments in that file). Confirm:
+   - primary = gold CTA  
+   - accent = royal  
+   - sidebar = navy shells  
+4. **Restore landing helpers** if still used: `.navy-grid`, `bg-brand-radial` / `--background-image-brand-radial`, `.mask-fade`, `animate-marquee` (+ reduced-motion rule). Copy from git history or this doc’s inventory if the file was wiped.
+5. **Smoke-check roles** (not just “CSS loaded”):
+   - Join Fellowship / primary buttons → gold, not navy  
+   - Hero, footer, auth, dashboard nav → navy shells (`bg-sidebar`)  
+   - Find Your Team / royal actions → accent  
+   - Featured Event badge still readable (may need the `bg-primary` className)  
+   - Platform / auth still show grid + radial if desired  
+   - Events gallery still marquee-scrolls  
+6. **Scan feature overrides** that assume the old look (`normal-case`, `shadow-none`, underline inputs, filled Badge). Adjust only if the new preset makes them wrong.
+7. **Do not reintroduce** `bg-royal`, `text-gold`, `bg-navy`, or raw brand hex in components. Remap tokens only.
+8. **Update this file** if you add/remove a custom helper or change the brand map.
+
+## One-command expectation (honest)
+
+| Expectation | Reality |
+| --- | --- |
+| One cmd restyles all shadcn parts | Yes (`components/ui/*`) |
+| One cmd keeps DITSCF brand | No — re-apply token map |
+| One cmd keeps platform grid / marquee | No — re-add helpers |
+| Landing “just works” on any preset | Only if new preset’s token **roles** match gold/royal/navy mapping |
+
+Until brand tokens live only in a preset you control (or a post-install script restores `globals.css` fragments), treat steps 3–5 as required after every style change.
+
+## Finding custom bits again
+
+```bash
+# Landing / auth helpers
+rg "navy-grid|mask-fade|animate-marquee|bg-brand-radial" app components
+
+# Brand comments / map
+rg "DITSCF brand|Brand token" app/globals.css docs/design
+
+# Avoid regressions to old color names
+rg "\\b(text|bg|border)-(royal|gold|navy)\\b|shadow-premium|section-shell|\\bglass\\b" app components --glob '!components/ui/**'
+```
+
+Checked against the codebase as of the Sera + DITSCF token work. Update the date/inventory when the map or helpers change.
