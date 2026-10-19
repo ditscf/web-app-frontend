@@ -461,10 +461,17 @@ The list below is the current V1 rule set. It replaces the earlier open question
 
 - Applicant → Pending → Active Member → Associate.
 - Pending expires 48 hours after submission if approval is not completed. The person must register again.
-- Both the General Secretary and the Vice General Secretary must take part. One of them acting alone does not complete approval. Approval creates the Fellowship ID.
-- Applications may be submitted and approved while the year is OPEN or CLOSED. The 48-hour expiry continues while CLOSED.
+- Both the General Secretary and the Vice General Secretary must take part. One of them acting alone does not complete approval. Approval creates the Fellowship ID. See "GS-assisted registration" for the assisted exception.
+- Applications may be submitted and approved while the year is OPEN or CLOSED. The 48-hour expiry continues while CLOSED. GS-assisted registration itself is allowed only while the year is OPEN.
 - Required registration fields: email (primary unique identifier), first name, last name, phone, class, course, year of study, date of birth.
 - After approval, only the member may change those profile fields, except date of birth. See "Member profile" below.
+
+**GS-assisted registration — approved by the project owner**
+
+- The General Secretary may submit a registration on a person's behalf while the year is OPEN (`GS_ASSISTED`). That submission counts as the General Secretary's participation.
+- The Vice General Secretary must still approve before membership is created. The General Secretary cannot also record an approval decision on a registration they assisted.
+- Self-submitted registrations (`SELF`) still require a General Secretary decision and then a Vice General Secretary completion.
+- Design: `docs/design/assisted-registration.md`.
 
 **Ministry**
 
@@ -550,6 +557,11 @@ Rules 4, 5, and 12–15 describe workflows (appointment, replacement, year closu
 - A member may be removed from their last ministry and then belongs to none.
 - The current leader of a ministry cannot be removed from that ministry. Another leader is appointed first.
 - The member list of a ministry can be seen by the Chairman, the current-year leader of that ministry, and current members of that ministry, while the year is OPEN or CLOSED. Anyone else, including another ministry's leader or a member with no ministry, sees nothing.
+
+**Member lookup and own ministries — approved by the project owner on 2026-10-06**
+
+- An Active Member can view the ministries they currently belong to, in any year state. This is the "their ministries" view in BRS section 7.
+- The Chairman, the General Secretary, the Vice General Secretary, and current-year Ministry Leaders can look up a member by Fellowship ID while the year is OPEN or CLOSED. The lookup shows only the member's name, Fellowship ID, membership status, and whether they have finished onboarding. It exists so the person can be confirmed before an appointment or a membership change.
 
 **Ministry rule changes — approved by the project owner on 2026-10-05**
 

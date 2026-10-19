@@ -13,10 +13,13 @@ import {
 import { FellowshipIdField } from '@/components/ministries/fellowship-id-field';
 import { Button } from '@/components/ui/button';
 import { getUserFacingMessage, toApiError, type ApiErrorKind } from '@/lib/api/errors';
+import { getLookupActionBlocker, lookupMember } from '@/lib/api/members';
 import { appointMinistryLeader, type LeaderAppointment, type MinistryWithLeader } from '@/lib/api/ministries';
 import { FELLOWSHIP_ID_LENGTH, fellowshipIdSchema } from '@/lib/validation';
 
-type DialogStage = { stage: 'enter' } | { stage: 'confirm'; fellowshipId: string };
+type DialogStage =
+  | { stage: 'enter' }
+  | { stage: 'confirm'; member: { fellowshipId: string; firstName: string; lastName: string } };
 
 const FELLOWSHIP_ID_INPUT_ID = 'leader-fellowship-id';
 /** Refusals about the person entered: shown under the field so the Chairman can correct the ID. */
@@ -35,21 +38,47 @@ export function AppointLeaderDialog({ target, yearLabel, onClose, onAppointed, o
   const [dialogStage, setDialogStage] = useState<DialogStage>({ stage: 'enter' });
   const [fellowshipId, setFellowshipId] = useState('');
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const [isLookingUp, setIsLookingUp] = useState(false);
   const [isAppointing, setIsAppointing] = useState(false);
   const currentLeader = target?.leader ?? null;
+  const isBusy = isLookingUp || isAppointing;
 
   function handleOpenChange(isOpen: boolean) {
-    if (!isOpen && !isAppointing) onClose();
+    if (!isOpen && !isBusy) onClose();
   }
 
-  function handleEnterSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleEnterSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const parsed = fellowshipIdSchema.safeParse(fellowshipId);
     if (!parsed.success) {
       setFieldError(parsed.error.issues[0]?.message ?? `A Fellowship ID has ${FELLOWSHIP_ID_LENGTH} digits.`);
       return;
     }
-    setDialogStage({ stage: 'confirm', fellowshipId: parsed.data });
+
+    setIsLookingUp(true);
+    try {
+      const member = await lookupMember(parsed.data);
+      const blocker = getLookupActionBlocker(member, 'appoint');
+      if (blocker) {
+        setFieldError(blocker);
+        return;
+      }
+      setDialogStage({
+        stage: 'confirm',
+        member: { fellowshipId: member.fellowshipId, firstName: member.firstName, lastName: member.lastName },
+      });
+    } catch (error) {
+      const apiError = toApiError(error);
+      if (apiError.kind === 'unauthenticated') return;
+      if (FIELD_ERROR_KINDS.includes(apiError.kind)) {
+        setFieldError(apiError.message);
+        return;
+      }
+      toast.error("We couldn't confirm that Fellowship ID", { description: getUserFacingMessage(error) });
+      if (apiError.kind === 'forbidden') onRefused();
+    } finally {
+      setIsLookingUp(false);
+    }
   }
 
   async function handleConfirm() {
@@ -57,7 +86,7 @@ export function AppointLeaderDialog({ target, yearLabel, onClose, onAppointed, o
 
     setIsAppointing(true);
     try {
-      const appointment = await appointMinistryLeader(target.ministry.id, dialogStage.fellowshipId);
+      const appointment = await appointMinistryLeader(target.ministry.id, dialogStage.member.fellowshipId);
       onAppointed(appointment);
     } catch (error) {
       const apiError = toApiError(error);
@@ -94,28 +123,30 @@ export function AppointLeaderDialog({ target, yearLabel, onClose, onAppointed, o
                   autoFocus
                   value={fellowshipId}
                   error={fieldError}
+                  disabled={isLookingUp}
                   onValueChange={(value) => {
                     setFellowshipId(value);
                     if (fieldError) setFieldError(null);
                   }}
                 />
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <Button type="submit" size="sm">
-                    Continue
+                  <AlertDialogCancel disabled={isLookingUp}>Cancel</AlertDialogCancel>
+                  <Button type="submit" size="sm" disabled={isLookingUp}>
+                    {isLookingUp ? 'Checking...' : 'Continue'}
                   </Button>
                 </AlertDialogFooter>
               </form>
             ) : (
               <>
                 <AlertDialogDescription>
-                  Appoint the member with Fellowship ID{' '}
-                  <strong className="font-bold text-navy">{dialogStage.fellowshipId}</strong> as leader of{' '}
-                  {target.ministry.name} for {yearLabel}?
+                  Appoint{' '}
+                  <strong className="font-bold text-foreground">
+                    {dialogStage.member.firstName} {dialogStage.member.lastName}
+                  </strong>{' '}
+                  ({dialogStage.member.fellowshipId}) as leader of {target.ministry.name} for {yearLabel}?
                   {currentLeader
                     ? ` This replaces ${currentLeader.firstName} ${currentLeader.lastName} (${currentLeader.fellowshipId}).`
-                    : null}{' '}
-                  Check the ID carefully: the member&apos;s name is shown after appointing.
+                    : null}
                 </AlertDialogDescription>
                 <AlertDialogFooter>
                   <Button

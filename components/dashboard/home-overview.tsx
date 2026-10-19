@@ -12,8 +12,10 @@ import {
 } from '@/lib/auth/responsibility-labels';
 import type { ResponsibilityItem } from '@/interfaces/interface';
 
-
-function toResponsibilityItems({ operativeYear, responsibilities }: ActorProfile): ResponsibilityItem[] {
+function toResponsibilityItems({
+  operativeYear,
+  responsibilities,
+}: ActorProfile): ResponsibilityItem[] {
   if (!operativeYear) return [];
 
   const officeItems = responsibilities.offices.map((office) => ({
@@ -48,40 +50,52 @@ export function HomeOverview() {
   const responsibilityItems = toResponsibilityItems(actor);
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-6">
+    <div className='mx-auto grid max-w-4xl gap-6'>
       <header>
-        <h1 className="text-3xl font-black text-navy">Welcome, {actor.firstName}</h1>
-        <p className="mt-1 text-slate-600">
-          Fellowship ID <span className="font-semibold text-navy">{actor.fellowshipId}</span>
+        <h1 className='text-3xl font-bold text-foreground'>
+          Welcome, {actor.firstName}
+        </h1>
+        <p className='mt-1 text-muted-foreground'>
+          Fellowship ID{' '}
+          <span className='font-semibold text-foreground'>
+            {actor.fellowshipId}
+          </span>
         </p>
       </header>
 
       <NeedsAttention />
 
-      <Card className="rounded-2xl p-6 shadow-none">
-        <h2 className="text-lg font-black text-navy">Fellowship year</h2>
+      <Card className='p-6 shadow-none'>
+        <h2 className='text-lg font-bold text-foreground'>Fellowship year</h2>
         {operativeYear ? (
-          <p className="mt-2 text-slate-700">
-            {operativeYear.label}, {YEAR_STATUS_LABELS[operativeYear.status].toLowerCase()}
+          <p className='mt-2 text-foreground'>
+            {operativeYear.label},{' '}
+            {YEAR_STATUS_LABELS[operativeYear.status].toLowerCase()}
           </p>
         ) : (
-          <p className="mt-2 text-slate-600">No fellowship year is open right now.</p>
+          <p className='mt-2 text-muted-foreground'>
+            No fellowship year is open right now.
+          </p>
         )}
       </Card>
 
-      <Card className="rounded-2xl p-6 shadow-none">
-        <h2 className="text-lg font-black text-navy">Your responsibilities</h2>
+      <Card className='p-6 shadow-none'>
+        <h2 className='text-lg font-bold text-foreground'>
+          Your responsibilities
+        </h2>
         {responsibilityItems.length > 0 ? (
-          <ul className="mt-3 divide-y divide-slate-200">
+          <ul className='mt-3 divide-y divide-slate-200'>
             {responsibilityItems.map((item) => (
-              <li key={item.key} className="py-3">
-                <p className="font-semibold text-navy">{item.title}</p>
-                <p className="text-sm text-slate-600">{item.detail}</p>
+              <li key={item.key} className='py-3'>
+                <p className='font-semibold text-foreground'>{item.title}</p>
+                <p className='text-sm text-muted-foreground'>{item.detail}</p>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-slate-600">You don&apos;t hold any responsibilities this year.</p>
+          <p className='mt-2 text-muted-foreground'>
+            You don&apos;t hold any responsibilities this year.
+          </p>
         )}
       </Card>
     </div>

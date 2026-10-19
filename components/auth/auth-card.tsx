@@ -15,13 +15,24 @@ export function AuthCard({
   className?: string;
 }) {
   return (
-    <section className={cn('glass w-full rounded-4xl p-3 text-navy shadow-premium sm:p-4', className)}>
-      <div className="rounded-3xl bg-white p-5 sm:p-8">
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-royal">{eyebrow}</p>
-        <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight sm:text-4xl">{title}</h1>
-        {description ? <div className="mt-3 leading-7 text-slate-600">{description}</div> : null}
-        <div className="mt-8">{children}</div>
-      </div>
+    <section
+      className={cn(
+        'w-full bg-card/80 p-5 text-foreground shadow-lg ring-1 ring-foreground/5 backdrop-blur-xl sm:p-8',
+        className,
+      )}
+    >
+      <p className='text-sm font-bold uppercase tracking-[0.18em] text-accent'>
+        {eyebrow}
+      </p>
+      <h1 className='mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl'>
+        {title}
+      </h1>
+      {description ? (
+        <div className='mt-3 leading-7 text-muted-foreground'>
+          {description}
+        </div>
+      ) : null}
+      <div className='mt-8'>{children}</div>
     </section>
   );
 }

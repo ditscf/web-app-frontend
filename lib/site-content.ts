@@ -12,13 +12,8 @@ import {
   ShieldCheck,
   UsersRound,
 } from 'lucide-react';
-import type { ComponentType } from 'react';
-import {
-  DribbbleIcon,
-  FacebookIcon,
-  InstagramIcon,
-  YoutubeIcon,
-} from '@/components/landing/social-icons';
+import type { IconType } from 'react-icons';
+import { FaInstagram, FaYoutube } from 'react-icons/fa';
 import type { StaticImageData } from 'next/image';
 import praiseWorshipImage from '@/public/09.jpg';
 import mediaTeamImage from '@/public/01.jpg';
@@ -88,19 +83,13 @@ export type Pillar = {
 
 export type SocialLink = {
   label: string;
-  icon: ComponentType<{ size?: number; className?: string }>;
-};
-
-export type ContactField = {
-  id: string;
-  label: string;
-  type?: 'text' | 'email' | 'tel';
-  autoComplete: string;
+  href: string;
+  icon: IconType;
 };
 
 export const ditscfLogoImage = ditscfLogo;
 
-export const navItems = ['About', 'Ministries', 'Events', 'Platform', 'Contact'] as const;
+export const navItems = ['About', 'Ministries', 'Events', 'Platform'] as const;
 
 export const heroImages = [pic01, pic02, mediaTeamImage];
 
@@ -302,15 +291,14 @@ export const pillars: Pillar[] = [
 ];
 
 export const socialLinks: SocialLink[] = [
-  { label: 'Facebook', icon: FacebookIcon },
-  { label: 'Instagram', icon: InstagramIcon },
-  { label: 'YouTube', icon: YoutubeIcon },
-  { label: 'Dribbble', icon: DribbbleIcon },
-];
-
-export const contactFields: ContactField[] = [
-  { id: 'full-name', label: 'Full name', autoComplete: 'name' },
-  { id: 'email', label: 'Email address', type: 'email', autoComplete: 'email' },
-  { id: 'phone', label: 'Phone number', type: 'tel', autoComplete: 'tel' },
-  { id: 'department', label: 'Department / Course', autoComplete: 'organization' },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/fellowshipditscf',
+    icon: FaInstagram,
+  },
+  {
+    label: 'YouTube',
+    href: 'https://www.youtube.com/@ditscffellowship',
+    icon: FaYoutube,
+  },
 ];

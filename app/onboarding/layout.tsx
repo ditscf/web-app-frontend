@@ -6,8 +6,8 @@ import { ditscfLogoImage } from '@/lib/site-content';
 export default function OnboardingLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <CurrentActorProvider>
-      <div className="min-h-screen bg-slate-50">
-        <header className="border-b border-slate-200 bg-white">
+      <div className="min-h-screen bg-muted">
+        <header className="border-b border-border bg-card">
           <div className="mx-auto flex h-16 max-w-2xl items-center justify-between gap-4 px-4 sm:px-6">
             <Image src={ditscfLogoImage} alt="DITSCF" className="h-9 w-auto object-contain" priority />
             <SignOutButton />

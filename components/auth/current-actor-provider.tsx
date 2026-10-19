@@ -84,7 +84,7 @@ export function CurrentActorProvider({ children }: { children: ReactNode }) {
   if (state.status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
-        <p role="status" className="text-sm font-semibold text-slate-600">
+        <p role="status" className="text-sm font-semibold text-muted-foreground">
           Checking your session...
         </p>
       </div>
@@ -95,8 +95,8 @@ export function CurrentActorProvider({ children }: { children: ReactNode }) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
         <div role="alert" className="space-y-1">
-          <p className="font-bold text-navy">We couldn&apos;t load your account.</p>
-          <p className="text-sm text-slate-600">{state.message}</p>
+          <p className="font-bold text-foreground">We couldn&apos;t load your account.</p>
+          <p className="text-sm text-muted-foreground">{state.message}</p>
         </div>
         <Button type="button" onClick={handleRetry}>
           Try again

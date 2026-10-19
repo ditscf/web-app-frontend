@@ -180,12 +180,12 @@ export function SignInForm() {
                 aria-invalid={Boolean(emailError)}
                 aria-describedby={emailError ? 'email-error' : undefined}
                 className={cn(
-                  'placeholder:font-semibold placeholder:text-slate-400',
-                  emailError && 'border-red-500 focus:border-red-500',
+                  'placeholder:font-semibold placeholder:text-muted-foreground',
+                  emailError && 'border-destructive focus:border-destructive',
                 )}
               />
               {emailError ? (
-                <p id="email-error" role="alert" className="text-sm font-semibold text-red-600">
+                <p id="email-error" role="alert" className="text-sm font-semibold text-destructive">
                   {emailError}
                 </p>
               ) : null}
@@ -194,9 +194,9 @@ export function SignInForm() {
               {isRequestingCode ? 'Sending code...' : 'Continue'} <ArrowRight size={18} />
             </Button>
           </form>
-          <p className="mt-6 text-center text-sm text-slate-600">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             New to DITSCF?{' '}
-            <Link href="/auth/signup" className="font-bold text-royal hover:underline">
+            <Link href="/auth/signup" className="font-bold text-accent hover:underline">
               Create an account
             </Link>
           </p>
@@ -207,7 +207,7 @@ export function SignInForm() {
           title="Check your inbox."
           description={
             <>
-              We sent a 6-digit code to <strong className="break-all font-bold text-navy">{email}</strong>.
+              We sent a 6-digit code to <strong className="break-all font-bold text-foreground">{email}</strong>.
               If that email exists, enter the code sent to it to sign in.
             </>
           }
@@ -223,7 +223,7 @@ export function SignInForm() {
                 </InputOTPGroup>
               </InputOTP>
               {codeError ? (
-                <p id="code-error" role="alert" className="text-sm font-semibold text-red-600">
+                <p id="code-error" role="alert" className="text-sm font-semibold text-destructive">
                   {codeError}
                 </p>
               ) : null}
@@ -236,13 +236,13 @@ export function SignInForm() {
             <Button type="button" variant="ghost" size="sm" className="-ml-4" onClick={handleChangeEmail}>
               <ArrowLeft size={16} /> Use a different email
             </Button>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               Didn&apos;t get it?{' '}
               <button
                 type="button"
                 onClick={handleResendCode}
                 disabled={isRequestingCode || isSigningIn}
-                className="rounded-full disabled:opacity-50 font-bold text-royal hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gold"
+                className="rounded-full disabled:opacity-50 font-bold text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Resend code
               </button>

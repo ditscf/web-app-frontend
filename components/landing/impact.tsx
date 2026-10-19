@@ -7,19 +7,21 @@ import { impactStats } from '@/lib/site-content';
 
 export function Impact() {
   return (
-    <section className="section-shell py-24">
+    <section className='mx-auto w-full max-w-6xl px-4 py-24'>
       <SectionHeader
         center
-        eyebrow="Impact"
-        title="The fruit of consistent worship, discipleship, and service."
+        eyebrow='Impact'
+        title='The fruit of consistent worship, discipleship, and service.'
       />
-      <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className='mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         {impactStats.map((stat) => (
-          <Card key={stat.label} className="rounded-4xl p-8 text-center">
-            <strong className="block text-5xl font-black text-royal">
+          <Card key={stat.label} className='p-8 text-center'>
+            <strong className='block text-5xl font-bold text-accent'>
               <AnimatedNumber value={stat.value} />
             </strong>
-            <span className="mt-3 block font-bold text-slate-600">{stat.label}</span>
+            <span className='mt-3 block font-bold text-muted-foreground'>
+              {stat.label}
+            </span>
           </Card>
         ))}
       </div>

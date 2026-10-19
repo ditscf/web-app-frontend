@@ -96,3 +96,15 @@ export async function removeMinistryMember(ministryId: string, fellowshipId: str
   const { data } = await apiClient.post(`${ministryMembersPath(ministryId)}/remove`, { fellowshipId });
   return parseResponse(memberRemovedSchema, data);
 }
+
+const myMinistriesSchema = z.object({
+  ministries: z.array(z.object({ ministry: ministrySchema, since: z.string() })),
+});
+
+export type MyMinistries = z.infer<typeof myMinistriesSchema>;
+
+/** The caller's current ministries. Uses `member.viewOwn`; ended memberships are omitted. */
+export async function listOwnMinistries(): Promise<MyMinistries> {
+  const { data } = await apiClient.get('/v1/ministries/mine');
+  return parseResponse(myMinistriesSchema, data);
+}

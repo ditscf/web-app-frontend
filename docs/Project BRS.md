@@ -11,9 +11,10 @@ The system shall:
 - Register an applicant with email (primary unique identifier), first name, last name, phone number, class, course, year of study, and date of birth.
 - Set the application to Pending.
 - Require both the General Secretary and the Vice General Secretary to take part before approval is complete.
+- Let the General Secretary submit a registration on a person's behalf while the year is OPEN. That submission counts as the General Secretary's participation. The Vice General Secretary must still approve. The General Secretary cannot also record an approval on a registration they assisted.
 - Generate a Fellowship ID when approval is complete, and set the person to Active Member.
 - Expire a Pending application 48 hours after submission if approval is not complete. The person must register again.
-- Allow registration and approval while a fellowship year is OPEN or CLOSED.
+- Allow self registration and approval while a fellowship year is OPEN or CLOSED. GS-assisted registration is allowed only while the year is OPEN.
 - Allow only the member to change their own profile fields after approval, except date of birth.
 - Apply a change of email only after the member confirms a code sent to the new address.
 - Keep date of birth fixed after registration, visible to the member only.

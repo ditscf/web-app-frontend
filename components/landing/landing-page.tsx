@@ -1,7 +1,6 @@
 'use client';
 
 import { About } from '@/components/landing/about';
-import { Contact } from '@/components/landing/contact';
 import { Events } from '@/components/landing/events';
 import { Footer } from '@/components/landing/footer';
 import { Gallery } from '@/components/landing/gallery';
@@ -16,7 +15,7 @@ import { Values } from '@/components/landing/values';
 
 export function LandingPage() {
   return (
-    <main className="bg-white">
+    <main className="bg-card">
       <Header />
       <Hero />
       <About />
@@ -28,7 +27,6 @@ export function LandingPage() {
       <DigitalPlatform />
       <Leadership />
       <Gallery />
-      <Contact />
       <Footer />
     </main>
   );

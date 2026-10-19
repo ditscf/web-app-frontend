@@ -240,7 +240,7 @@ export function ProfileDetailsForm({ profile, onSaved, onCancel }: ProfileDetail
       </FormField>
 
       {formError ? (
-        <p id={FORM_ERROR_ID} role="alert" className="text-sm font-semibold text-red-600">
+        <p id={FORM_ERROR_ID} role="alert" className="text-sm font-semibold text-destructive">
           {formError}
         </p>
       ) : null}
@@ -263,7 +263,7 @@ function FormField({ id, label, error, children }: { id: string; label: string; 
       <Label htmlFor={id}>{label}</Label>
       {children}
       {error ? (
-        <p id={`${id}-error`} role="alert" className="text-sm font-semibold text-red-600">
+        <p id={`${id}-error`} role="alert" className="text-sm font-semibold text-destructive">
           {error}
         </p>
       ) : null}

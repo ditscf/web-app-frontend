@@ -16,11 +16,14 @@ Technical design for how the DITSCF-MS frontend decides what each member sees. B
 | `isOnboardingRequired(actor)` | The API's onboarding requirement on member routes | Onboarding gate, sign-in redirect |
 | `getApprovalStep(actor)` | `member.approveAsGs`, `member.approveAsVgs` | Which approve button the queue shows; home counts |
 | `canReviewApplications(actor)` | `member.reviewApplications`, plus onboarding | Applications nav link and page; home counts |
+| `canRegisterAssisted(actor)` | `member.registerAssisted`: the General Secretary, year OPEN | Register a member on the applications page |
 | `canManageOwnProfile(actor)` | `member.viewOwn`, `member.editOwnProfile`: an Active Member | My profile |
 | `canViewMinistryLeaders(actor)` | No policy action; the API only requires onboarding | Ministries nav link and page |
 | `canAppointMinistryLeaders(actor)` | `ministry.appointLeader`: the Chairman, year OPEN | Appoint or replace leaders; home count of ministries without a leader |
 | `canManageMinistryMembers(actor, ministryId)` | `ministry.manageMembership`: the Chairman, or that ministry's leader, year OPEN | Add or remove ministry members |
-| `canOverseeMinistryMembers(actor, ministryId)` | `ministry.viewMembership`: the Chairman, or that ministry's leader, year OPEN or CLOSED | Link to a ministry's member list; closed-year note |
+| `canOverseeMinistryMembers(actor, ministryId)` | `ministry.viewMembership`: the Chairman, or that ministry's leader, year OPEN or CLOSED | Closed-year note; part of member-list links |
+| `canViewMinistryMembers(actor, ministryId, ownMinistryIds)` | `ministry.viewMembership`, plus own ministries from `GET /ministries/mine` | Link to a ministry's member list |
+| `canLookupMember(actor)` | `member.lookup`: Chairman, GS, VGS, or a Ministry Leader, year OPEN or CLOSED | Confirm a Fellowship ID before appoint or add |
 
 Every rule also requires completed onboarding, because the API requires it on those routes.
 
@@ -28,7 +31,7 @@ Notes:
 
 - `/me` returns no responsibilities when there is no operative year (the holiday). The rules therefore check that `operativeYear` is present and do not repeat the year-status rule: OPEN and CLOSED are the only statuses `/me` returns, and both allow application review.
 - A member who holds the General Secretary office is treated as the General Secretary step. The backend prevents one person from recording both steps.
-- `ministry.viewMembership` also allows current members of the ministry being viewed. `/auth/me` does not list a member's ministries, so the frontend shows no link for that case; a direct visit still works because the API decides.
+- `ministry.viewMembership` also allows current members of the ministry being viewed. The ministries page loads `GET /v1/ministries/mine` for those links; a direct visit still works when the API allows it.
 - When a backend policy action changes, update the matching rule and this table together.
 
 ## Keeping the profile current
@@ -92,13 +95,15 @@ Items with a zero count are hidden, as is an item whose request fails. The whole
 | `components/dashboard/home-overview.tsx` | Home page |
 | `components/dashboard/needs-attention.tsx` | Pending work on the home page |
 | `components/applications/applications-review.tsx` | Applications queue and step-aware approval |
+| `components/applications/assisted-registration-form.tsx` | GS-assisted registration (`docs/design/assisted-registration.md`) |
 | `components/onboarding/require-onboarding-complete.tsx` | Dashboard onboarding gate |
 | `components/onboarding/onboarding-form.tsx` | Ministry selection and onboarding submission |
 | `components/auth/current-actor-provider.tsx` | Loads `/auth/me`; `useCurrentActor()` and `useRefreshCurrentActor()` |
 | `components/profile/` | My profile and email change (`docs/design/profile.md`) |
 | `components/ministries/` | Ministries, leaders, and members (`docs/design/ministries.md`) |
-| `lib/api/applications.ts` | Sign-up, pending list, approval |
-| `lib/api/ministries.ts` | Ministry list, leaders, appointment, members |
+| `lib/api/applications.ts` | Sign-up, assisted registration, pending list, approval |
+| `lib/api/ministries.ts` | Ministry list, my ministries, leaders, appointment, members |
+| `lib/api/members.ts` | Lookup by Fellowship ID |
 | `lib/api/onboarding.ts` | Onboarding submission |
 | `lib/api/profile.ts` | Own profile, edit, email change |
 
@@ -106,4 +111,4 @@ Items with a zero count are hidden, as is an item whose request fails. The whole
 
 - **Visibility can lag the API by one load.** The profile is loaded when a layout mounts. If an office changes while a member is signed in, links update on the next load; the API refuses any action in the meantime.
 - **Home counts can be stale.** They are loaded once per home visit, not refreshed live.
-- **Some modules are not built yet.** Events, fellowship year closure, graduation, and member access views (my ministries, my events, past years) wait for their backend endpoints (see `docs/roadmap.md`).
+- **Some modules are not built yet.** Events, fellowship year closure, graduation, and remaining member access views (my events, past years) wait for their backend endpoints (see `docs/roadmap.md`).

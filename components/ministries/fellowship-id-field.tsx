@@ -41,14 +41,14 @@ export function FellowshipIdField({
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
         className={cn(
-          'placeholder:font-semibold placeholder:text-slate-400',
-          error && 'border-red-500 focus:border-red-500',
+          'placeholder:font-semibold placeholder:text-muted-foreground',
+          error && 'border-destructive focus:border-destructive',
           className,
         )}
         {...props}
       />
       {error ? (
-        <p id={errorId} role="alert" className="text-sm font-semibold text-red-600">
+        <p id={errorId} role="alert" className="text-sm font-semibold text-destructive">
           {error}
         </p>
       ) : null}

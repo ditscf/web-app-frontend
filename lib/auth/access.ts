@@ -28,6 +28,15 @@ export function canReviewApplications(actor: ActorProfile): boolean {
   return actor.onboardingCompleted && getApprovalStep(actor) !== null;
 }
 
+/** Mirrors `member.registerAssisted`: the General Secretary, while the year is OPEN. */
+export function canRegisterAssisted(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    isYearOpen(actor) &&
+    actor.responsibilities.offices.includes('GENERAL_SECRETARY')
+  );
+}
+
 /** Mirrors `member.viewOwn` and `member.editOwnProfile`, plus the API's onboarding requirement. */
 export function canManageOwnProfile(actor: ActorProfile): boolean {
   return actor.onboardingCompleted && actor.membershipStatus === 'ACTIVE';
@@ -50,13 +59,37 @@ export function canManageMinistryMembers(actor: ActorProfile, ministryId: string
 
 /**
  * Mirrors `ministry.viewMembership` for the Chairman (any ministry) and that ministry's leader, while the
- * year is OPEN or CLOSED. The API also lets members see their own ministry, which `/auth/me` can't tell.
+ * year is OPEN or CLOSED. Ordinary members are covered by `canViewMinistryMembers` using `GET /ministries/mine`.
  */
 export function canOverseeMinistryMembers(actor: ActorProfile, ministryId: string): boolean {
   return (
     actor.onboardingCompleted &&
     actor.operativeYear !== null &&
     (isChairman(actor) || leadsMinistry(actor, ministryId))
+  );
+}
+
+/**
+ * Mirrors `ministry.viewMembership` for a link on the ministries page: oversee, or a ministry returned by
+ * `GET /ministries/mine`, while there is an operative year.
+ */
+export function canViewMinistryMembers(
+  actor: ActorProfile,
+  ministryId: string,
+  ownMinistryIds: ReadonlySet<string>,
+): boolean {
+  return canOverseeMinistryMembers(actor, ministryId) || (actor.operativeYear !== null && ownMinistryIds.has(ministryId));
+}
+
+/** Mirrors `member.lookup`: the Chairman, GS, VGS, or a Ministry Leader, while the year is OPEN or CLOSED. */
+export function canLookupMember(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    actor.operativeYear !== null &&
+    (isChairman(actor) ||
+      actor.responsibilities.offices.includes('GENERAL_SECRETARY') ||
+      actor.responsibilities.offices.includes('VICE_GENERAL_SECRETARY') ||
+      leadsAMinistry(actor))
   );
 }
 
@@ -70,4 +103,8 @@ function isChairman(actor: ActorProfile): boolean {
 
 function leadsMinistry(actor: ActorProfile, ministryId: string): boolean {
   return actor.responsibilities.ministryLeadership?.ministry.id === ministryId;
+}
+
+function leadsAMinistry(actor: ActorProfile): boolean {
+  return actor.responsibilities.ministryLeadership !== null;
 }
