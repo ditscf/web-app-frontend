@@ -4,6 +4,7 @@ import './globals.css';
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {children}
         <Toaster />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
