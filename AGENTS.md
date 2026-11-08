@@ -84,9 +84,9 @@ MCP-specific workflows and decisions should be documented under `docs/mcp/`.
 
 ## Current Phase
 
-The project is currently focused on understanding the requirements and developing the first conceptual system design.
+V1 dashboard features through `docs/roadmap.md` **Done** are implemented. **Next work is blocked on backend Event Management APIs**; follow `docs/roadmap.md` when those endpoints exist.
 
-Do not introduce implementation technologies until the project team has discussed and approved the relevant technical decisions.
+When the parent workspace is open, shared coordination lives in `../docs/PROJECT_CONTEXT.md` (outside this Git repo).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

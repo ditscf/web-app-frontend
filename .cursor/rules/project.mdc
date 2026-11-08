@@ -14,8 +14,8 @@ alwaysApply: true
 
 ## Requirements First
 
-- The project is currently technology-agnostic.
-- Do not introduce or assume a technology stack unless explicitly approved.
+- Stack is Next.js, Auth.js, shadcn/Radix, Tailwind v4 (see `docs/design/ui-components.md`).
+- Do not introduce a new stack unless explicitly approved.
 - Separate business requirements from technical decisions.
 - Never convert an assumption into a requirement.
 - Clearly identify unknowns, conflicts, and decisions that require team discussion.
