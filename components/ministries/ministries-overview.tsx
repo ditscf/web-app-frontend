@@ -8,11 +8,14 @@ import {
   useCurrentActor,
   useRefreshCurrentActor,
 } from '@/components/auth/current-actor-provider';
+import { EmptyState, ErrorState } from '@/components/dashboard/async-state';
 import {
   DashboardPage,
   dashboardCardClassName,
 } from '@/components/dashboard/dashboard-page';
 import { NoAccess } from '@/components/dashboard/no-access';
+import { PageHeader } from '@/components/dashboard/page-header';
+import { StatusBadge } from '@/components/dashboard/status-badge';
 import { AppointLeaderDialog } from '@/components/ministries/appoint-leader-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -52,13 +55,9 @@ function SummaryStat({
   hint?: string;
 }) {
   return (
-    <Card className={cn('relative overflow-hidden p-5', dashboardCardClassName)}>
-      <div
-        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-30"
-        aria-hidden
-      />
-      <div className="relative flex gap-4">
-        <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+    <Card className={cn('p-5', dashboardCardClassName)}>
+      <div className="flex gap-4">
+        <div className="flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent">
           <Icon size={20} aria-hidden />
         </div>
         <div className="min-w-0">
@@ -224,37 +223,18 @@ export function MinistriesOverview() {
 
   return (
     <DashboardPage>
-      <header className="relative isolate overflow-hidden border border-border bg-card">
-        <div
-          className="pointer-events-none absolute inset-0 bg-brand-radial opacity-50"
-          aria-hidden
-        />
-        <div className="relative flex flex-wrap items-start justify-between gap-4 border-b border-primary/25 bg-linear-to-r from-primary/12 via-primary/5 to-transparent px-6 py-8 sm:px-8">
-          <div>
-            <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-              Ministries
-            </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Fellowship ministries
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              {subtitle}
-            </p>
-          </div>
-          {operativeYear ? (
-            <span
-              className={cn(
-                'inline-flex items-center px-2.5 py-1 text-xs font-semibold tracking-wide uppercase',
-                yearIsOpen
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground',
-              )}
-            >
+      <PageHeader
+        eyebrow="Ministries"
+        title="Fellowship ministries"
+        description={subtitle}
+        actions={
+          operativeYear ? (
+            <StatusBadge tone={yearIsOpen ? 'success' : 'warning'}>
               {YEAR_STATUS_LABELS[operativeYear.status]}
-            </span>
-          ) : null}
-        </div>
-      </header>
+            </StatusBadge>
+          ) : null
+        }
+      />
 
       {leadersState.status === 'ready' && ministries.length > 0 ? (
         <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -297,26 +277,7 @@ export function MinistriesOverview() {
       ) : null}
 
       {leadersState.status === 'error' ? (
-        <Card
-          role="alert"
-          className={cn('relative overflow-hidden p-6', dashboardCardClassName)}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
-            aria-hidden
-          />
-          <div className="relative">
-            <p className="font-bold text-foreground">
-              We couldn&apos;t load the ministries.
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {leadersState.message}
-            </p>
-            <Button type="button" size="sm" className="mt-4" onClick={handleRetry}>
-              Try again
-            </Button>
-          </div>
-        </Card>
+        <ErrorState message={leadersState.message} onRetry={handleRetry} />
       ) : null}
 
       {leadersState.status === 'ready' ? (
@@ -333,7 +294,7 @@ export function MinistriesOverview() {
             </div>
             {operativeYear ? (
               <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CalendarDays size={16} className="text-primary" aria-hidden />
+                <CalendarDays size={16} className="text-accent" aria-hidden />
                 <span>{operativeYear.label}</span>
               </p>
             ) : null}
@@ -353,25 +314,18 @@ export function MinistriesOverview() {
                   <li key={item.ministry.id}>
                     <Card
                       className={cn(
-                        'relative flex h-full flex-col overflow-hidden p-5 transition-colors',
+                        'flex h-full flex-col p-5',
                         dashboardCardClassName,
-                        !hasLeader && yearIsOpen
-                          ? 'border-primary/30 bg-primary/5'
-                          : 'hover:border-primary/30 hover:bg-primary/5',
+                        !hasLeader && yearIsOpen && 'border-warning/40',
                       )}
                     >
-                      <div
-                        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-0 transition-opacity hover:opacity-20"
-                        aria-hidden
-                      />
-                      <div className="relative flex flex-1 flex-col">
-                        <div className="mb-3 h-0.5 w-10 bg-primary" aria-hidden />
+                      <div className="flex flex-1 flex-col">
                         <div className="flex items-start justify-between gap-2">
                           <h3 className="text-base font-bold text-foreground">
                             {canOpenMembers ? (
                               <Link
                                 href={`/dashboard/ministries/${item.ministry.id}`}
-                                className="hover:text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                                className="hover:text-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
                               >
                                 {item.ministry.name}
                               </Link>
@@ -380,9 +334,7 @@ export function MinistriesOverview() {
                             )}
                           </h3>
                           {!hasLeader && yearIsOpen ? (
-                            <span className="shrink-0 bg-primary/15 px-2 py-0.5 text-[0.625rem] font-semibold tracking-widest text-primary uppercase">
-                              Vacant
-                            </span>
+                            <StatusBadge tone="warning">Vacant</StatusBadge>
                           ) : null}
                         </div>
 
@@ -423,7 +375,7 @@ export function MinistriesOverview() {
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="normal-case tracking-normal text-primary hover:bg-primary/10 hover:text-primary"
+                              className="tracking-normal text-accent normal-case hover:bg-accent/10 hover:text-accent"
                               onClick={() => setAppointTarget(item)}
                             >
                               {hasLeader ? 'Replace leader' : 'Appoint leader'}
@@ -437,12 +389,10 @@ export function MinistriesOverview() {
               })}
             </ul>
           ) : (
-            <Card className={cn('p-6', dashboardCardClassName)}>
-              <p className="text-muted-foreground">
-                No ministries are listed right now. When a fellowship year opens,
-                ministry leadership will appear here.
-              </p>
-            </Card>
+            <EmptyState
+              title="No ministries listed"
+              description="When a fellowship year opens, ministry leadership will appear here."
+            />
           )}
         </section>
       ) : null}

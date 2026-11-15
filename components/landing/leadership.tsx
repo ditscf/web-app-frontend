@@ -7,7 +7,8 @@ import { leaders } from '@/lib/site-content';
 
 export function Leadership() {
   return (
-    <section className='mx-auto w-full max-w-6xl px-4 py-20'>
+    <section className="bg-card py-20 md:py-24">
+      <div className="mx-auto w-full max-w-6xl px-4">
       <SectionHeader
         center
         eyebrow='Leadership Team'
@@ -15,7 +16,7 @@ export function Leadership() {
       />
       <div className='mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-5'>
         {leaders.map((leader) => (
-          <Card key={leader.role} className='overflow-hidden text-center'>
+          <Card key={leader.role} className="overflow-hidden border border-border text-center shadow-none ring-0">
             <div className='relative h-44'>
               <Image
                 src={leader.image}
@@ -27,13 +28,16 @@ export function Leadership() {
             </div>
             <div className='p-5'>
               <p className='mt-1 font-bold text-accent'>{leader.name}</p>
-              <CardTitle>{leader.role}</CardTitle>
+              <CardTitle className="mt-1 text-sm font-semibold tracking-normal normal-case">
+                {leader.role}
+              </CardTitle>
               <CardDescription className='mt-3 text-sm leading-6'>
                 {leader.text}
               </CardDescription>
             </div>
           </Card>
         ))}
+      </div>
       </div>
     </section>
   );

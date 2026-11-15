@@ -1,5 +1,6 @@
 'use client';
 
+import { MotionConfig } from 'framer-motion';
 import { About } from '@/components/landing/about';
 import { Events } from '@/components/landing/events';
 import { Footer } from '@/components/landing/footer';
@@ -15,19 +16,21 @@ import { Values } from '@/components/landing/values';
 
 export function LandingPage() {
   return (
-    <main className="bg-card">
-      <Header />
-      <Hero />
-      <About />
-      <Values />
-      <Ministries />
-      <Events />
-      <Impact />
-      <Testimonials />
-      <DigitalPlatform />
-      <Leadership />
-      <Gallery />
-      <Footer />
-    </main>
+    <MotionConfig reducedMotion="user">
+      <main className="bg-background">
+        <Header />
+        <Hero />
+        <About />
+        <Values />
+        <Ministries />
+        <Events />
+        <Impact />
+        <Testimonials />
+        <DigitalPlatform />
+        <Leadership />
+        <Gallery />
+        <Footer />
+      </main>
+    </MotionConfig>
   );
 }

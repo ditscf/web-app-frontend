@@ -111,17 +111,18 @@ export function OnboardingForm() {
 
   return (
     <div className='mx-auto grid max-w-2xl gap-6'>
-      <header>
-        <h1 className='text-3xl font-bold text-foreground'>
+      <header className="border-b border-border pb-6">
+        <p className="text-xs font-semibold tracking-widest text-accent uppercase">Onboarding</p>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
           Welcome to DITSCF, {actor.firstName}
         </h1>
-        <p className='mt-2 text-muted-foreground'>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           Before you continue, choose the ministries you will serve in. You can
           choose more than one.
         </p>
       </header>
 
-      <Card className='p-6 shadow-none'>
+      <Card className="border border-border p-6 shadow-none ring-0">
         {ministriesState.status === 'loading' ? (
           <p
             role='status'

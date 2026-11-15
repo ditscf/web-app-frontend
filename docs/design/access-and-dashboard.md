@@ -24,6 +24,13 @@ Technical design for how the DITSCF-MS frontend decides what each member sees. B
 | `canOverseeMinistryMembers(actor, ministryId)` | `ministry.viewMembership`: the Chairman, or that ministry's leader, year OPEN or CLOSED | Closed-year note; part of member-list links |
 | `canViewMinistryMembers(actor, ministryId, ownMinistryIds)` | `ministry.viewMembership`, plus own ministries from `GET /ministries/mine` | Link to a ministry's member list |
 | `canLookupMember(actor)` | `member.lookup`: Chairman, GS, VGS, or a Ministry Leader, year OPEN or CLOSED | Confirm a Fellowship ID before appoint or add |
+| `canViewMemberDirectory(actor)` | `member.viewDirectory`: Chairman, Vice Chairman, GS, or VGS, year OPEN or CLOSED | Members nav and directory page |
+| `canViewEvents(actor)` | No policy action; the API only requires onboarding | Events nav link and list |
+| `canCreateEvents(actor)` / `canAppointEventCommittee(actor)` | `event.create` / `event.appointCommittee`: Chairman, year OPEN | Create event; appoint or replace committee |
+| `canOperateEvent(actor, eventId)` | `event.manageOperations`: Event Chairman of that event, year OPEN | Participants and venue while ACTIVE |
+| `canCloseEvent(actor, eventId)` | `event.close` | Close event |
+| `canManageEventAttendance(actor, eventId)` | `event.manageAttendance`: Event Chairman or Secretary, year OPEN | Sessions and present-only marks while ACTIVE |
+| `canCorrectOrArchiveEvent(actor)` | `event.correctClosed` / `event.archive`: Vice Chairman | Correct CLOSED events; archive |
 
 Every rule also requires completed onboarding, because the API requires it on those routes.
 
@@ -101,8 +108,10 @@ Items with a zero count are hidden, as is an item whose request fails. The whole
 | `components/auth/current-actor-provider.tsx` | Loads `/auth/me`; `useCurrentActor()` and `useRefreshCurrentActor()` |
 | `components/profile/` | My profile and email change (`docs/design/profile.md`) |
 | `components/ministries/` | Ministries, leaders, and members (`docs/design/ministries.md`) |
+| `components/events/` | Events, committee, sessions, attendance, participants (`docs/design/events.md`) |
 | `lib/api/applications.ts` | Sign-up, assisted registration, pending list, approval |
 | `lib/api/ministries.ts` | Ministry list, my ministries, leaders, appointment, members |
+| `lib/api/events.ts` | Event list, create, committee, participants, lifecycle |
 | `lib/api/members.ts` | Lookup by Fellowship ID |
 | `lib/api/onboarding.ts` | Onboarding submission |
 | `lib/api/profile.ts` | Own profile, edit, email change |
@@ -111,4 +120,4 @@ Items with a zero count are hidden, as is an item whose request fails. The whole
 
 - **Visibility can lag the API by one load.** The profile is loaded when a layout mounts. If an office changes while a member is signed in, links update on the next load; the API refuses any action in the meantime.
 - **Home counts can be stale.** They are loaded once per home visit, not refreshed live.
-- **Some modules are not built yet.** Events, fellowship year closure, graduation, and remaining member access views (my events, past years) wait for their backend endpoints (see `docs/roadmap.md`).
+- **Some modules are not built yet.** Fellowship year closure, graduation, and remaining member access views (my events, past years) wait for their backend endpoints (see `docs/roadmap.md`).

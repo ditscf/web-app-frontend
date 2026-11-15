@@ -24,6 +24,12 @@
     @apply font-sans;
     scroll-behavior: smooth;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
   body {
     @apply min-w-80 overflow-x-hidden bg-background text-foreground;
   }
@@ -72,6 +78,19 @@
   --accent-foreground: oklch(1 0 0);
 
   --destructive: oklch(0.577 0.245 27.325);
+
+  /*
+    Lifecycle status — not brand fills.
+    Gold stays the CTA. These colors label open, closed, pending, and notes.
+    Text variants are dark enough for small labels on the light page.
+  */
+  --success: oklch(0.42 0.11 155);
+  --success-foreground: oklch(0.98 0.01 155);
+  --warning: oklch(0.46 0.11 65);
+  --warning-foreground: oklch(0.98 0.01 85);
+  --info: oklch(0.42 0.09 250);
+  --info-foreground: oklch(0.98 0.005 250);
+
   --border: oklch(0.929 0.013 255.5);
   --input: oklch(0.929 0.013 255.5);
   --ring: oklch(0.387 0.147 261.3);
@@ -82,8 +101,21 @@
   --chart-4: oklch(0.337 0.125 260.9);
   --chart-5: oklch(0.879 0.143 87.6);
 
-  /* Square corners match Sera (rounded-none). Keep 0 so radius utilities stay sharp. */
+  /*
+    Square corners match Sera (rounded-none). Keep 0 so radius utilities stay sharp.
+    Type scale (Inter):
+      eyebrow — text-xs font-semibold uppercase tracking-widest (public sections)
+      page title — text-2xl/3xl font-bold tracking-tight, sentence case (dashboard)
+      section title — text-lg font-semibold (dashboard) or text-3xl/4xl (public)
+      body — text-sm/base leading-relaxed
+      meta — text-xs/sm text-muted-foreground
+    Spacing: section rhythm py-20 md:py-24 on the public site; dashboard pages use gap-6.
+  */
   --radius: 0;
+
+  /* Hairline elevation. Prefer a border on operational cards; use these on overlays. */
+  --shadow-elevated: 0 1px 2px color-mix(in oklab, var(--foreground) 6%, transparent);
+  --shadow-overlay: 0 12px 32px color-mix(in oklab, var(--foreground) 12%, transparent);
 
   /* Navy — dark shells (hero, footer, auth, dashboard nav) */
   --sidebar: oklch(0.198 0.057 262.6); /* #07142F */
@@ -116,7 +148,15 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-info-foreground: var(--info-foreground);
+  --color-info: var(--info);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning: var(--warning);
+  --color-success-foreground: var(--success-foreground);
+  --color-success: var(--success);
   --color-accent-foreground: var(--accent-foreground);
+  --shadow-elevated: var(--shadow-elevated);
+  --shadow-overlay: var(--shadow-overlay);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
@@ -179,6 +219,24 @@
   .animate-marquee {
     animation: none;
   }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+  Sonner paints the description nearly white when the OS theme is dark, while
+  this app stays on the light surface. Keep both lines in the same ink.
+*/
+[data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: var(--foreground) !important;
+  opacity: 1 !important;
 }
 
 .dark {
@@ -197,6 +255,12 @@
   --accent: oklch(0.45 0.14 261);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
+  --success: oklch(0.74 0.14 155);
+  --success-foreground: oklch(0.2 0.04 155);
+  --warning: oklch(0.8 0.12 85);
+  --warning-foreground: oklch(0.28 0.06 70);
+  --info: oklch(0.75 0.08 250);
+  --info-foreground: oklch(0.2 0.04 250);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.808 0.166 82.7);

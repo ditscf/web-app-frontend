@@ -11,7 +11,7 @@ const MotionCard = motion.create(Card);
 
 export function Values() {
   return (
-    <section className='bg-muted py-20'>
+    <section className="bg-card py-20 md:py-24">
       <div className='mx-auto w-full max-w-6xl px-4'>
         <SectionHeader
           center
@@ -22,7 +22,10 @@ export function Values() {
           {values.map((value, index) => (
             <MotionCard
               key={value.title}
-              className={cn('p-6', index < 2 && 'md:col-span-3 lg:col-span-1')}
+              className={cn(
+                'border border-border p-6 shadow-none ring-0',
+                index < 2 && 'md:col-span-3 lg:col-span-1',
+              )}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -31,7 +34,9 @@ export function Values() {
               <div className='mb-5 grid size-12 place-items-center bg-accent/20 text-accent'>
                 <CheckCircle2 size={22} />
               </div>
-              <CardTitle className='text-xl'>{value.title}</CardTitle>
+              <CardTitle className="text-xl font-semibold tracking-normal normal-case">
+                {value.title}
+              </CardTitle>
               <CardDescription className='mt-3'>{value.text}</CardDescription>
             </MotionCard>
           ))}

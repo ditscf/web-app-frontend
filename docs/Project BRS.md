@@ -52,9 +52,11 @@ An office, ministry leadership, or event role counts only when it has not ended 
 
 The Treasurer has no operational responsibility in the first version.
 
-The Vice Chairman has no additional OPEN-year duty. The Vice Chairman may correct a CLOSED event and archive it.
+The Vice Chairman may correct a CLOSED event and archive it. While a fellowship year is OPEN or CLOSED, the Vice Chairman may also view the fellowship member directory (see Member access).
 
-The Vice General Secretary’s defined duty is joint approval with the General Secretary.
+The Vice General Secretary’s defined duty is joint approval with the General Secretary. While a fellowship year is OPEN or CLOSED, the Vice General Secretary may also view the fellowship member directory (see Member access).
+
+While a fellowship year is OPEN or CLOSED, the Chairman and the General Secretary may view the fellowship member directory (see Member access).
 
 ## 4. Ministry management
 
@@ -120,6 +122,8 @@ The system shall give an Active Member an account from which they can view:
 
 The member may edit only their own profile fields. They shall not edit ministry membership, event membership, leadership records, closure records, or another member’s records.
 
+While a fellowship year is OPEN or CLOSED, the Chairman, Vice Chairman, General Secretary, and Vice General Secretary may view a fellowship-wide member directory of Active Members and Associates. Each row shows name and Fellowship ID only (not email, phone, or date of birth). They may search and filter that list and view composition summaries (counts by status, onboarding, and year of study). Ministry Leaders do not receive this directory. This is operational oversight, not the deferred reporting and analytics module.
+
 ## 8. First version
 
 The first version shall implement:
@@ -132,7 +136,7 @@ The first version shall implement:
 
 It shall also implement fellowship-year governance, closure and preservation, and the role boundaries in this document.
 
-The first version shall not implement attendance and engagement, fellowship-wide financial management, reporting and analytics, communication, or advanced ministry-specific tools.
+The first version shall not implement fellowship-wide attendance and engagement scoring, fellowship-wide financial management, full reporting and analytics, communication, or advanced ministry-specific tools. Event-scoped attendance (sessions and present-only marks) is in scope; the officer member directory (name and Fellowship ID with composition summaries) is in scope; event contributions follow that work.
 
 ## 9. Success
 

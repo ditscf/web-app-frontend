@@ -2,7 +2,7 @@
 
 Supplements [`docs/roadmap.md`](roadmap.md). Cross-repo context: [`../../docs/PROJECT_CONTEXT.md`](../../docs/PROJECT_CONTEXT.md) (workspace root, not in this Git repo).
 
-Last updated: **8 Nov 2026**.
+Last updated: **9 Nov 2026**.
 
 ## Cursor chat references
 
@@ -24,7 +24,7 @@ Stored under Cursor’s local `agent-transcripts` for `Users-gilbertmunuo-Gilber
 | Oct 6 2026 | Full shadcn/Radix migration (`docs/design/ui-components.md`) |
 | Oct 19 2026 | GS-assisted form; dashboard UX pass; Vercel analytics/speed insights (`aa0a82e`) |
 
-**Blocked:** all post-step-9 modules until backend ships Events (see roadmap **Blocked** section).
+**Done (Nov 2026):** Event Management and attendance UI (`/dashboard/events`, sessions/rolls). Still blocked: contributions, year closure, graduation, my-events history (see roadmap **Blocked**).
 
 ## Stack (current)
 

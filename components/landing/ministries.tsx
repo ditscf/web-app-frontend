@@ -14,7 +14,7 @@ const MotionCard = motion.create(Card);
 
 export function Ministries() {
   return (
-    <section id='ministries' className='mx-auto w-full max-w-6xl px-4 py-20'>
+    <section id="ministries" className="mx-auto w-full max-w-6xl px-4 py-20 md:py-24">
       <div className='flex flex-col justify-between gap-8 lg:flex-row lg:items-end'>
         <SectionHeader
           eyebrow='Ministries Showcase'
@@ -35,7 +35,7 @@ export function Ministries() {
         {ministries.map((ministry, index) => (
           <MotionCard
             key={ministry.title}
-            className='group overflow-hidden p-0'
+            className="group overflow-hidden border border-border p-0 shadow-none ring-0"
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -51,7 +51,9 @@ export function Ministries() {
               />
             </div>
             <div className='p-6'>
-              <CardTitle className='text-xl normal-case tracking-normal'>{ministry.title}</CardTitle>
+              <CardTitle className="text-xl font-semibold tracking-normal normal-case">
+                {ministry.title}
+              </CardTitle>
               <CardDescription className='mt-3'>
                 {ministry.description}
               </CardDescription>

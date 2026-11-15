@@ -27,7 +27,7 @@ The Treasurer is an official role and has no operational work in the first versi
 
 While a fellowship year is OPEN, the Chairman starts the year, creates events, appoints Ministry Leaders and event committees, and manages ministry membership and event records.
 
-The Vice Chairman has no additional duties defined while a year is OPEN. The Vice Chairman corrects a CLOSED event and archives that event.
+The Vice Chairman corrects a CLOSED event and archives that event. While a year is OPEN or CLOSED, the Chairman, Vice Chairman, General Secretary, and Vice General Secretary may view the fellowship member directory (name and Fellowship ID, with search, filters, and composition summaries).
 
 The Vice General Secretary’s defined duty is joint membership approval with the General Secretary.
 
@@ -83,4 +83,4 @@ An Active Member can view their profile, Fellowship ID, ministries, events they 
 
 The first version is Member Management, Ministry Management, Leadership and Roles, Event Management, and Member Access, plus fellowship-year governance, closure rules, and role-based access.
 
-Later work: attendance and engagement, fellowship-wide finance, reporting and analytics, communication, advanced ministry tools, Associate sign-in, and any further Vice Chairman or Vice General Secretary duties.
+Later work: attendance and engagement, fellowship-wide finance, full reporting and analytics, communication, advanced ministry tools, and Associate sign-in. The officer member directory is part of the first version.

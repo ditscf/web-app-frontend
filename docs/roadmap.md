@@ -22,10 +22,13 @@ Each step follows the same loop: inspect, make the smallest change, verify, repo
 | Home count of ministries without a leader | `docs/design/access-and-dashboard.md` |
 | My ministries links and Fellowship ID lookup before appoint/add | `docs/design/ministries.md` |
 | UI stack: Tailwind CSS v4, shadcn on Radix instead of Base UI, stock styling | `docs/design/ui-components.md` |
+| Event Management (create, committee, participants, close, archive) | `docs/design/events.md` |
+| Event attendance (sessions, present-only marks) | `docs/design/events.md` |
+| Officer member directory (name + Fellowship ID, search/filters, composition charts) | `docs/design/member-directory.md` |
 
 ## Next
 
-Nothing is unblocked. Every remaining module waits for a backend endpoint (see "Blocked" below). The next frontend phase starts when the backend ships its next step (Events); its plan is written here first.
+Nothing unblocked for the directory. Contributions wait for the backend Event Treasurer APIs (see "Blocked" below).
 
 ## Phase record: GS-assisted registration (done 2026-10-19)
 
@@ -164,14 +167,83 @@ Backend shipped `GET /v1/ministries/mine` and `GET /v1/members/lookup/:fellowshi
 
 - The Auth.js session keeps the name and email from sign-in. Nothing in the UI reads them (screens use `/auth/me`), so a profile or email change does not update the Auth.js session.
 
+## Phase record: Event Management (done 2026-11-09)
+
+Consumed backend roadmap step 10. Scope: create, committee, participants, venue, close, Vice Chairman correction, and archive. Associates may be participants; committee and Active lookup stay Active-only.
+
+### Backend contracts
+
+| Endpoint | Who |
+| --- | --- |
+| `GET /v1/events/list` | Any onboarded member |
+| `POST /v1/events/new` | `event.create` |
+| `POST /v1/events/:eventId/committee` | `event.appointCommittee` |
+| `GET /v1/events/:eventId/participants/lookup/:fellowshipId` | Event Chairman while ACTIVE, or Vice Chairman while CLOSED |
+| `GET /v1/events/:eventId/participants/list` | Any onboarded member (operative year) |
+| `POST …/participants/add` and `…/remove` | `event.manageOperations` while ACTIVE; Vice Chairman while CLOSED |
+| `PATCH /v1/events/:eventId/update` | Event Chairman while ACTIVE; Vice Chairman while CLOSED |
+| `POST …/close` / `…/archive` | `event.close` / `event.archive` |
+
+### Visibility rules added
+
+`canViewEvents`, `canCreateEvents`, `canAppointEventCommittee`, `canOperateEvent`, `canCloseEvent`, `canCorrectOrArchiveEvent` in `lib/auth/access.ts`.
+
+### UI
+
+- `/dashboard/events` and `/dashboard/events/[eventId]`
+- Committee confirm uses Active `member.lookup`; participant confirm uses the event participant lookup
+- Design notes: `docs/design/events.md`
+
+## Phase record: Event attendance (done 2026-11-10)
+
+Consumed backend roadmap step 10b. Multiple sessions per event; present-only marks for current participants. Event Chairman or Event Secretary while ACTIVE; Vice Chairman while CLOSED. Contributions and reports stay out.
+
+### Backend contracts
+
+| Endpoint | Who |
+| --- | --- |
+| `GET /v1/events/:eventId/sessions/list` | Any onboarded member |
+| `POST /v1/events/:eventId/sessions/new` | `event.manageAttendance` / `event.correctClosed` |
+| `PATCH …/sessions/:sessionId` and `POST …/remove` | Same |
+| `GET …/sessions/:sessionId/attendance` | Any onboarded member |
+| `POST …/attendance/mark` and `…/unmark` | Same as create session |
+
+### Visibility rules added
+
+`canManageEventAttendance` in `lib/auth/access.ts`.
+
+### UI
+
+- Sessions section on the event detail page; open roll with present toggles
+- Design notes: `docs/design/events.md`
+
+## Phase record: Officer member directory (done 2026-11-15)
+
+Consumed backend roadmap step 10c. Scope: fellowship-wide directory for Chairman, Vice Chairman, GS, and VGS — name + Fellowship ID, search/filters, composition charts. Not full reporting.
+
+### Backend contracts
+
+| Endpoint | Who |
+| --- | --- |
+| `GET /v1/members/list` | `member.viewDirectory` |
+| `GET /v1/members/summary` | Same; same query filters as list |
+
+### Visibility
+
+`canViewMemberDirectory` in `lib/auth/access.ts`. Nav: Members → `/dashboard/members`.
+
+### UI
+
+Search, status and onboarded filters, three Recharts bar charts (shadcn Chart), table of name + Fellowship ID. Design: `docs/design/member-directory.md`.
+
 ## Blocked: waiting for backend endpoints
 
-In the backend's build order:
+In the backend's build order (after 10c directory):
 
-1. **Events**: Chairman creates events and appoints committees; Event Chairman, Treasurer, and Secretary pages; close; Vice Chairman correction and archive.
+1. **Event contributions**: pledges and payments (Event Treasurer).
 2. **Fellowship year closure and archive**: General Secretary request with a 12-hour window, Chairman confirmation, archive.
 3. **Graduation**: Event Chairman request, Chairman confirmation.
-4. **Member access views**: my events, CLOSED and ARCHIVED records (archived years only, after onboarding; the current CLOSED year read-only). My ministries was done with ministry membership.
+4. **Member access views**: my events, CLOSED and ARCHIVED records (archived years only, after onboarding; the current CLOSED year read-only). My ministries was done with ministry membership. The officer directory is step 10c, not this item.
 
 ## Later
 

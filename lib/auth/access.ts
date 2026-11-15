@@ -93,12 +93,81 @@ export function canLookupMember(actor: ActorProfile): boolean {
   );
 }
 
+/** Mirrors `member.viewDirectory`: Chairman, Vice Chairman, GS, or VGS, while the year is OPEN or CLOSED. */
+export function canViewMemberDirectory(actor: ActorProfile): boolean {
+  if (!actor.onboardingCompleted || actor.operativeYear === null) return false;
+  const { offices } = actor.responsibilities;
+  return (
+    isChairman(actor) ||
+    offices.includes('VICE_CHAIRMAN') ||
+    offices.includes('GENERAL_SECRETARY') ||
+    offices.includes('VICE_GENERAL_SECRETARY')
+  );
+}
+
+/** Event list has no policy action: any onboarded member may read the operative-year list. */
+export function canViewEvents(actor: ActorProfile): boolean {
+  return actor.onboardingCompleted;
+}
+
+/** Mirrors `event.create` and `event.appointCommittee`. */
+export function canCreateEvents(actor: ActorProfile): boolean {
+  return actor.onboardingCompleted && isYearOpen(actor) && isChairman(actor);
+}
+
+export function canAppointEventCommittee(actor: ActorProfile): boolean {
+  return canCreateEvents(actor);
+}
+
+/** Mirrors `event.manageOperations` for a specific event. */
+export function canOperateEvent(actor: ActorProfile, eventId: string): boolean {
+  return (
+    actor.onboardingCompleted &&
+    isYearOpen(actor) &&
+    holdsEventRole(actor, eventId, 'EVENT_CHAIRMAN')
+  );
+}
+
+/** Mirrors `event.close`. */
+export function canCloseEvent(actor: ActorProfile, eventId: string): boolean {
+  return canOperateEvent(actor, eventId);
+}
+
+/** Mirrors `event.manageAttendance` for a specific event. */
+export function canManageEventAttendance(actor: ActorProfile, eventId: string): boolean {
+  return (
+    actor.onboardingCompleted &&
+    isYearOpen(actor) &&
+    (holdsEventRole(actor, eventId, 'EVENT_CHAIRMAN') ||
+      holdsEventRole(actor, eventId, 'EVENT_SECRETARY'))
+  );
+}
+
+/** Mirrors `event.correctClosed` and `event.archive`. */
+export function canCorrectOrArchiveEvent(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    actor.operativeYear !== null &&
+    actor.responsibilities.offices.includes('VICE_CHAIRMAN')
+  );
+}
+
 function isYearOpen(actor: ActorProfile): boolean {
   return actor.operativeYear?.status === 'OPEN';
 }
 
 function isChairman(actor: ActorProfile): boolean {
   return actor.responsibilities.offices.includes('CHAIRMAN');
+}
+
+function holdsEventRole(
+  actor: ActorProfile,
+  eventId: string,
+  role: ActorProfile['responsibilities']['eventRoles'][number]['role'],
+): boolean {
+  return actor.responsibilities.eventRoles.some(
+    (assignment) => assignment.event.id === eventId && assignment.role === role,
+  );
 }
 
 function leadsMinistry(actor: ActorProfile, ministryId: string): boolean {

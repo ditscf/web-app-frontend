@@ -10,7 +10,7 @@ export function DigitalPlatform() {
   return (
     <section
       id='platform'
-      className='navy-grid relative overflow-hidden bg-sidebar py-20 text-sidebar-foreground'
+      className="navy-grid relative overflow-hidden bg-sidebar py-20 text-sidebar-foreground md:py-24"
     >
       <div className='absolute inset-0 bg-brand-radial' />
       <div className='mx-auto w-full max-w-6xl px-4 relative grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center'>
@@ -44,8 +44,8 @@ export function DigitalPlatform() {
           transition={{ duration: 0.8 }}
         >
           <div className='flex items-center justify-between border-b border-border pb-4'>
-            <strong>DITSCF Command Center</strong>
-            <Badge variant='secondary'>Live</Badge>
+            <strong className="font-semibold tracking-normal normal-case">DITSCF Command Center</strong>
+            <Badge variant="secondary">Illustration</Badge>
           </div>
           <div className='mt-5 grid gap-4 md:grid-cols-[0.7fr_1.3fr]'>
             <div className='space-y-3'>
@@ -73,7 +73,7 @@ export function DigitalPlatform() {
                 {attendanceBars.map((height, index) => (
                   <div
                     key={height + index}
-                    className='flex-1 rounded-t-2xl bg-accent'
+                    className="flex-1 bg-accent"
                     style={{ height: `${height}%` }}
                   />
                 ))}

@@ -716,7 +716,7 @@ function ReviewSection({
   children: ReactNode;
 }) {
   return (
-    <section className='p-4 sm:p-5'>
+    <section className="border-t border-border p-4 first:border-t-0 sm:p-5">
       <div className='flex items-center justify-between gap-3'>
         <h2 className='text-sm font-bold text-foreground'>{title}</h2>
         <Button

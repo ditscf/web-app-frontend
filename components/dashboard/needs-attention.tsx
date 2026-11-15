@@ -184,27 +184,23 @@ export function NeedsAttention() {
             <Link href={href} className="group block h-full focus-visible:outline-hidden">
               <Card
                 className={cn(
-                  'relative h-full overflow-hidden p-5 transition-colors group-hover:border-primary/35 group-hover:bg-primary/5 group-focus-visible:ring-2 group-focus-visible:ring-ring',
+                  'h-full p-5 transition-colors group-hover:bg-muted group-focus-visible:ring-2 group-focus-visible:ring-ring',
                   dashboardCardClassName,
                 )}
               >
-                <div
-                  className="pointer-events-none absolute inset-0 bg-brand-radial opacity-0 transition-opacity group-hover:opacity-25"
-                  aria-hidden
-                />
-                <div className="relative flex items-start gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+                <div className="flex items-start gap-3">
+                  <div className="flex size-10 shrink-0 items-center justify-center bg-warning/12 text-warning">
                     <Icon size={20} aria-hidden />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-foreground">{label}</p>
-                    <p className="mt-1 text-xs font-semibold tracking-wide text-primary uppercase">
+                    <p className="mt-1 text-xs font-semibold tracking-wide text-accent uppercase">
                       Review now
                     </p>
                   </div>
                   <ChevronRight
                     size={18}
-                    className="mt-1 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+                    className="mt-1 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
                     aria-hidden
                   />
                 </div>

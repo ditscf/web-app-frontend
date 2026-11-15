@@ -563,6 +563,14 @@ Rules 4, 5, and 12–15 describe workflows (appointment, replacement, year closu
 - An Active Member can view the ministries they currently belong to, in any year state. This is the "their ministries" view in BRS section 7.
 - The Chairman, the General Secretary, the Vice General Secretary, and current-year Ministry Leaders can look up a member by Fellowship ID while the year is OPEN or CLOSED. The lookup shows only the member's name, Fellowship ID, membership status, and whether they have finished onboarding. It exists so the person can be confirmed before an appointment or a membership change.
 
+**Member directory — approved by the project owner on 2026-11-15**
+
+- While the year is OPEN or CLOSED, the Chairman, Vice Chairman, General Secretary, and Vice General Secretary may view a fellowship-wide member directory of Active Members and Associates.
+- Each directory row shows first name, last name, and Fellowship ID only. Email, phone, and date of birth are not shown.
+- Officers may search by name or Fellowship ID and filter by membership status and onboarding state.
+- Composition summaries (counts by status, onboarded vs not, and year of study) are allowed for the same filtered population. This is operational oversight for top officers, not the deferred Reporting and Analytics module.
+- Ministry Leaders do not receive the fellowship-wide directory; they continue to use ministry member lists and Fellowship ID lookup.
+
 **Ministry rule changes — approved by the project owner on 2026-10-05**
 
 After frontend testing, the project owner changed two ministry rules. The wording above (the "Ministry" summary, Ministry leadership rule 4, and "Ministry membership") already reflects them.
@@ -582,15 +590,13 @@ None. The five modules can move into detailed design.
 
 ## Deferred
 
-- Additional Vice Chairman duties while a year is OPEN.
-- Additional Vice General Secretary duties beyond joint approval.
 - Associate sign-in and other Associate operations.
-- Attendance, engagement, fellowship-wide finance, reporting and analytics, communication, and advanced ministry tools.
+- Attendance, engagement, fellowship-wide finance, full reporting and analytics, communication, and advanced ministry tools.
 
 ## Original document conflicts kept for reference
 
 - Communication is later work in the Vision and required in the BRS. V1 excludes it.
 - The Vision says members may view records. The BRS requires member accounts. V1 includes Member Access for Active Members, with the visibility rules above. Associates do not sign in during V1.
 - The BRS allows event chairpersons to close events. The team decision is that the Event Chairman closes the event.
-- The Vision and BRS describe attendance, finance, and reporting. Those stay out of V1. Event Treasurer records are limited to that event.
+- Fellowship-wide attendance, engagement scoring, finance, and full reporting stay out of V1 except **event-scoped** attendance (sessions and present-only marks) and the **officer member directory** (name and Fellowship ID with composition summaries). Event contributions follow the directory. Event Treasurer records remain limited to that event.
 

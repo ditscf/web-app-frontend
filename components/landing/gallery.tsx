@@ -9,7 +9,7 @@ import { gallery } from '@/lib/site-content';
 
 export function Gallery() {
   return (
-    <section className='bg-muted py-20'>
+    <section className="bg-background py-20 md:py-24">
       <div className='mx-auto w-full max-w-6xl px-4'>
         <SectionHeader
           center
