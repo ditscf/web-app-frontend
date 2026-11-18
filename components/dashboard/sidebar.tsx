@@ -4,7 +4,10 @@ import {
   CalendarDays,
   ClipboardCheck,
   ContactRound,
+  GraduationCap,
+  HandCoins,
   House,
+  Landmark,
   UserRound,
   UsersRound,
   type LucideIcon,
@@ -38,8 +41,11 @@ import {
   canManageOwnProfile,
   canReviewApplications,
   canViewEvents,
+  canViewGraduation,
   canViewMemberDirectory,
   canViewMinistryLeaders,
+  canViewOfferings,
+  canViewYearClosure,
 } from '@/lib/auth/access';
 import { YEAR_STATUS_LABELS } from '@/lib/auth/responsibility-labels';
 import { ditscfLogoImage } from '@/lib/site-content';
@@ -75,6 +81,24 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Events',
     icon: CalendarDays,
     isVisible: canViewEvents,
+  },
+  {
+    href: '/dashboard/offerings',
+    label: 'Offerings',
+    icon: HandCoins,
+    isVisible: canViewOfferings,
+  },
+  {
+    href: '/dashboard/year-closure',
+    label: 'Year closure',
+    icon: Landmark,
+    isVisible: canViewYearClosure,
+  },
+  {
+    href: '/dashboard/graduation',
+    label: 'Graduation',
+    icon: GraduationCap,
+    isVisible: canViewGraduation,
   },
   {
     href: '/dashboard/applications',

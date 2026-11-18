@@ -25,10 +25,18 @@ Each step follows the same loop: inspect, make the smallest change, verify, repo
 | Event Management (create, committee, participants, close, archive) | `docs/design/events.md` |
 | Event attendance (sessions, present-only marks) | `docs/design/events.md` |
 | Officer member directory (name + Fellowship ID, search/filters, composition charts) | `docs/design/member-directory.md` |
+| Event contributions (pledges and payments ledger) | `docs/design/events.md` |
+| Fellowship offerings (anonymous daily totals) | `docs/design/offerings.md` |
+| Fellowship year closure and archive | `docs/design/year-closure.md` |
+| Graduation and event self-join / committee join source | `docs/design/graduation.md`, `docs/design/events.md` |
 
 ## Next
 
-Nothing unblocked for the directory. Contributions wait for the backend Event Treasurer APIs (see "Blocked" below).
+Remaining member-access views (my events, past years).
+
+## Blocked note
+
+Remaining member-access views still wait on backend endpoints where noted below.
 
 ## Phase record: GS-assisted registration (done 2026-10-19)
 
@@ -236,14 +244,80 @@ Consumed backend roadmap step 10c. Scope: fellowship-wide directory for Chairman
 
 Search, status and onboarded filters, three Recharts bar charts (shadcn Chart), table of name + Fellowship ID. Design: `docs/design/member-directory.md`.
 
+## Phase record: Event contributions (done 2026-11-15)
+
+Consumed backend roadmap step 11. Scope: per-participant pledges and payments (whole TZS) on the event detail page. View for Event Chairman, Treasurer, Secretary; mutate by Treasurer while ACTIVE; Vice Chairman while CLOSED.
+
+### Backend contracts
+
+| Endpoint | Who |
+| --- | --- |
+| `GET /v1/events/:eventId/contributions` | `event.viewFinances` (+ VC while CLOSED) |
+| `PUT …/contributions/:fellowshipId/pledge` | Treasurer ACTIVE / VC CLOSED |
+| `POST …/contributions/:fellowshipId/payments` | Same |
+| `DELETE …/contributions/payments/:paymentId` | Same |
+
+### Visibility
+
+`canViewEventFinances` / `canManageEventFinances` in `lib/auth/access.ts`. UI: `components/events/event-contributions.tsx` on the event detail page.
+
+## Phase record: Fellowship offerings (done 2026-11-18)
+
+Consumed backend roadmap step 11b. Scope: anonymous daily offering totals (whole TZS). View for Chairman, VC, GS, VGS, Treasurer; mutate by Treasurer while OPEN; Chairman while CLOSED.
+
+### Backend contracts
+
+| Endpoint | Who |
+| --- | --- |
+| `GET /v1/offerings/list` | `offering.view` |
+| `PUT /v1/offerings` | Treasurer OPEN / Chairman CLOSED |
+| `DELETE /v1/offerings/:offeringId` | Same |
+
+### Visibility
+
+`canViewOfferings` / `canManageOfferings` / `canCorrectClosedYearOfferings` in `lib/auth/access.ts`. Nav: Offerings → `/dashboard/offerings`.
+
+## Phase record: Fellowship year closure (done 2026-11-18)
+
+Consumed backend roadmap step 12. Scope: GS 12-hour pending request, Chairman confirm (Rule 12), Chairman archive (Rules 13/15).
+
+### Backend contracts
+
+| Endpoint | Who |
+| --- | --- |
+| `GET /v1/fellowship-year/closure` | GS or Chairman |
+| `POST …/closure/request` and `…/cancel` | GS |
+| `POST …/closure/confirm` | Chairman |
+| `POST …/archive` | Chairman |
+
+### Visibility
+
+`canViewYearClosure` / `canRequestYearClosure` / `canConfirmYearClosure` / `canArchiveYear` in `lib/auth/access.ts`. Nav: Year closure → `/dashboard/year-closure`.
+
+## Phase record: Graduation and event self-join (done 2026-11-18)
+
+Consumed backend roadmap step 13. Scope: Graduation Chairman appointment, member self-apply, Graduation Chairman confirm/reject; event self-join / withdraw with `joinSource`.
+
+### Backend contracts
+
+| Endpoint | Who |
+| --- | --- |
+| `GET/POST /v1/graduation/chairman` | Read any onboarded; appoint Chairman |
+| `GET /v1/graduation/me` | Member eligibility / own application |
+| `POST /v1/graduation/apply` and `…/applications/:id/cancel` | Eligible member |
+| `GET /v1/graduation/applications/pending` and confirm/reject | Graduation Chairman |
+| `POST /v1/events/:eventId/participants/join` and `…/withdraw` | Member (SELF) |
+| `POST …/participants/add` | Event Chairman / VC → COMMITTEE |
+
+### Visibility
+
+`canViewGraduation` / `canAppointGraduationChairman` / `canDecideGraduation` / `canJoinEvents` in `lib/auth/access.ts`. Nav: Graduation → `/dashboard/graduation`.
+
 ## Blocked: waiting for backend endpoints
 
-In the backend's build order (after 10c directory):
+In the backend's build order (after step 13):
 
-1. **Event contributions**: pledges and payments (Event Treasurer).
-2. **Fellowship year closure and archive**: General Secretary request with a 12-hour window, Chairman confirmation, archive.
-3. **Graduation**: Event Chairman request, Chairman confirmation.
-4. **Member access views**: my events, CLOSED and ARCHIVED records (archived years only, after onboarding; the current CLOSED year read-only). My ministries was done with ministry membership. The officer directory is step 10c, not this item.
+1. **Member access views**: my events, CLOSED and ARCHIVED records (archived years only, after onboarding; the current CLOSED year read-only). My ministries was done with ministry membership. The officer directory is step 10c, not this item.
 
 ## Later
 

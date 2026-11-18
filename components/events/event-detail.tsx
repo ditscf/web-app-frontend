@@ -16,6 +16,7 @@ import { NoAccess } from '@/components/dashboard/no-access';
 import { PageHeader } from '@/components/dashboard/page-header';
 import { StatusBadge, type StatusTone } from '@/components/dashboard/status-badge';
 import { AppointCommitteeDialog } from '@/components/events/appoint-committee-dialog';
+import { EventContributionsPanel } from '@/components/events/event-contributions';
 import { EventSessions } from '@/components/events/event-sessions';
 import { FellowshipIdField } from '@/components/ministries/fellowship-id-field';
 import { Button } from '@/components/ui/button';
@@ -36,11 +37,13 @@ import {
   addEventParticipant,
   archiveEvent,
   closeEvent,
+  joinEvent,
   listEventParticipants,
   listEvents,
   lookupEventParticipant,
   removeEventParticipant,
   updateEvent,
+  withdrawFromEvent,
   type EventParticipantLookup,
   type EventParticipants,
   type EventRole,
@@ -50,8 +53,11 @@ import {
   canAppointEventCommittee,
   canCloseEvent,
   canCorrectOrArchiveEvent,
+  canJoinEvents,
   canManageEventAttendance,
+  canManageEventFinances,
   canOperateEvent,
+  canViewEventFinances,
   canViewEvents,
 } from '@/lib/auth/access';
 import { FELLOWSHIP_ID_LENGTH, fellowshipIdSchema } from '@/lib/validation';
@@ -94,6 +100,7 @@ export function EventDetail({ eventId }: EventDetailProps) {
   );
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<{
     fellowshipId: string;
     name: string;
@@ -108,12 +115,30 @@ export function EventDetail({ eventId }: EventDetailProps) {
   const canAppoint = canAppointEventCommittee(actor);
   const canClose = canCloseEvent(actor, eventId);
 
-  const canMutateParticipants = useMemo(() => {
+  const canMutateCommitteeParticipants = useMemo(() => {
     if (!summary) return false;
     if (summary.status === 'ACTIVE') return canOperate;
     if (summary.status === 'CLOSED') return canCorrect;
     return false;
   }, [summary, canOperate, canCorrect]);
+
+  const ownParticipation = useMemo(() => {
+    if (!participants) return null;
+    return (
+      participants.participants.find((row) => row.personId === actor.personId) ??
+      null
+    );
+  }, [participants, actor.personId]);
+
+  const canSelfJoin =
+    canJoinEvents(actor) &&
+    summary?.status === 'ACTIVE' &&
+    ownParticipation === null;
+
+  const canSelfWithdraw =
+    canJoinEvents(actor) &&
+    summary?.status === 'ACTIVE' &&
+    ownParticipation?.joinSource === 'SELF';
 
   const canMutateAttendance = useMemo(() => {
     if (!summary) return false;
@@ -122,7 +147,22 @@ export function EventDetail({ eventId }: EventDetailProps) {
     return false;
   }, [summary, actor, eventId, canCorrect]);
 
-  const canEditDetails = canMutateParticipants;
+  const canViewFinances = useMemo(() => {
+    if (!summary || summary.status === 'ARCHIVED') return false;
+    if (summary.status === 'CLOSED') {
+      return canViewEventFinances(actor, eventId) || canCorrect;
+    }
+    return canViewEventFinances(actor, eventId);
+  }, [summary, actor, eventId, canCorrect]);
+
+  const canMutateFinances = useMemo(() => {
+    if (!summary) return false;
+    if (summary.status === 'ACTIVE') return canManageEventFinances(actor, eventId);
+    if (summary.status === 'CLOSED') return canCorrect;
+    return false;
+  }, [summary, actor, eventId, canCorrect]);
+
+  const canEditDetails = canMutateCommitteeParticipants;
 
   const reload = useCallback(async () => {
     setIsLoading(true);
@@ -200,7 +240,7 @@ export function EventDetail({ eventId }: EventDetailProps) {
     try {
       await addEventParticipant(eventId, confirmCandidate.fellowshipId);
       toast.success(
-        `${confirmCandidate.firstName} ${confirmCandidate.lastName} joined the event`,
+        `${confirmCandidate.firstName} ${confirmCandidate.lastName} added to the committee`,
       );
       setConfirmCandidate(null);
       setFellowshipId('');
@@ -217,11 +257,47 @@ export function EventDetail({ eventId }: EventDetailProps) {
         setConfirmCandidate(null);
         return;
       }
-      toast.error("We couldn't add that participant", {
+      toast.error("We couldn't add that committee member", {
         description: getUserFacingMessage(error),
       });
     } finally {
       setIsAdding(false);
+    }
+  }
+
+  async function handleJoin() {
+    if (isJoining) return;
+    setIsJoining(true);
+    try {
+      await joinEvent(eventId);
+      toast.success('You joined this event');
+      await reload();
+    } catch (error) {
+      const apiError = toApiError(error);
+      if (apiError.kind === 'unauthenticated') return;
+      toast.error("We couldn't join the event", {
+        description: getUserFacingMessage(error),
+      });
+    } finally {
+      setIsJoining(false);
+    }
+  }
+
+  async function handleWithdraw() {
+    if (isJoining) return;
+    setIsJoining(true);
+    try {
+      await withdrawFromEvent(eventId);
+      toast.success('You left this event');
+      await reload();
+    } catch (error) {
+      const apiError = toApiError(error);
+      if (apiError.kind === 'unauthenticated') return;
+      toast.error("We couldn't leave the event", {
+        description: getUserFacingMessage(error),
+      });
+    } finally {
+      setIsJoining(false);
     }
   }
 
@@ -429,13 +505,43 @@ export function EventDetail({ eventId }: EventDetailProps) {
         canMutate={canMutateAttendance}
       />
 
+      <EventContributionsPanel
+        eventId={eventId}
+        eventStatus={summary.status}
+        canView={canViewFinances}
+        canMutate={canMutateFinances}
+      />
+
       <Card className={dashboardCardClassName}>
         <CardHeader>
           <CardTitle className="font-semibold tracking-normal normal-case">Participants</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {canMutateParticipants ? (
+          {canSelfJoin || canSelfWithdraw ? (
+            <div className="flex flex-wrap gap-2">
+              {canSelfJoin ? (
+                <Button type="button" disabled={isJoining} onClick={() => void handleJoin()}>
+                  {isJoining ? 'Joining…' : 'Join event'}
+                </Button>
+              ) : null}
+              {canSelfWithdraw ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isJoining}
+                  onClick={() => void handleWithdraw()}
+                >
+                  {isJoining ? 'Leaving…' : 'Withdraw'}
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+
+          {canMutateCommitteeParticipants ? (
             <form className="grid max-w-md gap-3" onSubmit={handleLookupParticipant}>
+              <p className="text-sm text-muted-foreground">
+                Add a committee participant by Fellowship ID.
+              </p>
               <FellowshipIdField
                 id="event-participant-fellowship-id"
                 value={fellowshipId}
@@ -466,10 +572,11 @@ export function EventDetail({ eventId }: EventDetailProps) {
                       {person.firstName} {person.lastName}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {person.fellowshipId} · {person.membershipStatus}
+                      {person.fellowshipId} · {person.membershipStatus} ·{' '}
+                      {person.joinSource === 'COMMITTEE' ? 'Committee' : 'Joined'}
                     </p>
                   </div>
-                  {canMutateParticipants ? (
+                  {canMutateCommitteeParticipants ? (
                     <Button
                       type="button"
                       variant="outline"
@@ -513,10 +620,10 @@ export function EventDetail({ eventId }: EventDetailProps) {
         }}
       >
         <AlertDialogContent>
-          <AlertDialogTitle>Add participant?</AlertDialogTitle>
+          <AlertDialogTitle>Add committee participant?</AlertDialogTitle>
           <AlertDialogDescription>
             {confirmCandidate
-              ? `Add ${confirmCandidate.firstName} ${confirmCandidate.lastName} (${confirmCandidate.fellowshipId}, ${confirmCandidate.membershipStatus}) to this event?`
+              ? `Add ${confirmCandidate.firstName} ${confirmCandidate.lastName} (${confirmCandidate.fellowshipId}, ${confirmCandidate.membershipStatus}) as a committee participant?`
               : null}
           </AlertDialogDescription>
           <AlertDialogFooter>

@@ -58,13 +58,16 @@ const committeeAppointmentSchema = z.object({
     .nullable(),
 });
 
+const joinSourceSchema = z.enum(['SELF', 'COMMITTEE']);
+
 const participantSchema = z.object({
   personId: z.string(),
   fellowshipId: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   membershipStatus: z.enum(['ACTIVE', 'ASSOCIATE']),
-  since: z.string(),
+  joinSource: joinSourceSchema,
+  since: z.string().optional(),
 });
 
 const participantsListSchema = z.object({
@@ -156,6 +159,24 @@ export async function listEventParticipants(eventId: string): Promise<EventParti
     `/v1/events/${encodeURIComponent(eventId)}/participants/list`,
   );
   return parseResponse(participantsListSchema, data);
+}
+
+export async function joinEvent(
+  eventId: string,
+): Promise<z.infer<typeof participantChangedSchema>> {
+  const { data } = await apiClient.post(
+    `/v1/events/${encodeURIComponent(eventId)}/participants/join`,
+  );
+  return parseResponse(participantChangedSchema, data);
+}
+
+export async function withdrawFromEvent(
+  eventId: string,
+): Promise<z.infer<typeof participantChangedSchema>> {
+  const { data } = await apiClient.post(
+    `/v1/events/${encodeURIComponent(eventId)}/participants/withdraw`,
+  );
+  return parseResponse(participantChangedSchema, data);
 }
 
 export async function addEventParticipant(
@@ -325,4 +346,114 @@ export async function unmarkSessionAttendance(
     { fellowshipId },
   );
   return parseResponse(attendanceMarkChangedSchema, data);
+}
+
+const contributionPaymentSchema = z.object({
+  id: z.string(),
+  amountTzs: z.number().int(),
+  note: z.string().nullable(),
+  recordedAt: z.string(),
+});
+
+const contributionRowSchema = z.object({
+  personId: z.string(),
+  fellowshipId: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  membershipStatus: z.enum(['ACTIVE', 'ASSOCIATE']),
+  pledgeTzs: z.number().int(),
+  paidTzs: z.number().int(),
+  outstandingTzs: z.number().int(),
+  payments: z.array(contributionPaymentSchema),
+});
+
+const contributionsListSchema = z.object({
+  event: z.object({ id: z.string(), name: z.string(), status: eventStatusSchema }),
+  rows: z.array(contributionRowSchema),
+  totals: z.object({
+    pledgeTzs: z.number().int(),
+    paidTzs: z.number().int(),
+    outstandingTzs: z.number().int(),
+  }),
+});
+
+const pledgeChangedSchema = z.object({
+  event: z.object({ id: z.string(), name: z.string(), status: eventStatusSchema }),
+  person: z.object({
+    personId: z.string(),
+    fellowshipId: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+  }),
+  pledgeTzs: z.number().int(),
+  paidTzs: z.number().int(),
+  outstandingTzs: z.number().int(),
+});
+
+const paymentChangedSchema = z.object({
+  event: z.object({ id: z.string(), name: z.string(), status: eventStatusSchema }),
+  person: z.object({
+    personId: z.string(),
+    fellowshipId: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+  }),
+  payment: contributionPaymentSchema,
+  pledgeTzs: z.number().int(),
+  paidTzs: z.number().int(),
+  outstandingTzs: z.number().int(),
+});
+
+const paymentRemovedSchema = z.object({
+  event: z.object({ id: z.string(), name: z.string(), status: eventStatusSchema }),
+  payment: z.object({
+    id: z.string(),
+    personId: z.string(),
+    amountTzs: z.number().int(),
+  }),
+  removedAt: z.string(),
+});
+
+export type EventContributions = z.infer<typeof contributionsListSchema>;
+export type ContributionRow = z.infer<typeof contributionRowSchema>;
+
+export async function listEventContributions(eventId: string): Promise<EventContributions> {
+  const { data } = await apiClient.get(
+    `/v1/events/${encodeURIComponent(eventId)}/contributions`,
+  );
+  return parseResponse(contributionsListSchema, data);
+}
+
+export async function setEventPledge(
+  eventId: string,
+  fellowshipId: string,
+  amountTzs: number,
+): Promise<z.infer<typeof pledgeChangedSchema>> {
+  const { data } = await apiClient.put(
+    `/v1/events/${encodeURIComponent(eventId)}/contributions/${encodeURIComponent(fellowshipId)}/pledge`,
+    { amountTzs },
+  );
+  return parseResponse(pledgeChangedSchema, data);
+}
+
+export async function recordEventPayment(
+  eventId: string,
+  fellowshipId: string,
+  input: { amountTzs: number; note?: string },
+): Promise<z.infer<typeof paymentChangedSchema>> {
+  const { data } = await apiClient.post(
+    `/v1/events/${encodeURIComponent(eventId)}/contributions/${encodeURIComponent(fellowshipId)}/payments`,
+    input,
+  );
+  return parseResponse(paymentChangedSchema, data);
+}
+
+export async function removeEventPayment(
+  eventId: string,
+  paymentId: string,
+): Promise<z.infer<typeof paymentRemovedSchema>> {
+  const { data } = await apiClient.delete(
+    `/v1/events/${encodeURIComponent(eventId)}/contributions/payments/${encodeURIComponent(paymentId)}`,
+  );
+  return parseResponse(paymentRemovedSchema, data);
 }

@@ -105,6 +105,92 @@ export function canViewMemberDirectory(actor: ActorProfile): boolean {
   );
 }
 
+/** Mirrors `offering.view`: five top officers while the year is OPEN or CLOSED. */
+export function canViewOfferings(actor: ActorProfile): boolean {
+  if (!actor.onboardingCompleted || actor.operativeYear === null) return false;
+  const { offices } = actor.responsibilities;
+  return (
+    isChairman(actor) ||
+    offices.includes('VICE_CHAIRMAN') ||
+    offices.includes('GENERAL_SECRETARY') ||
+    offices.includes('VICE_GENERAL_SECRETARY') ||
+    offices.includes('TREASURER')
+  );
+}
+
+/** Mirrors `offering.manage`: Treasurer while the year is OPEN. */
+export function canManageOfferings(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    isYearOpen(actor) &&
+    actor.responsibilities.offices.includes('TREASURER')
+  );
+}
+
+/** Chairman correcting offerings while the year is CLOSED (`fellowshipYear.correctClosed`). */
+export function canCorrectClosedYearOfferings(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    actor.operativeYear?.status === 'CLOSED' &&
+    isChairman(actor)
+  );
+}
+
+/** GS or Chairman may open the year-closure page while there is an operative year. */
+export function canViewYearClosure(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    actor.operativeYear !== null &&
+    (isChairman(actor) ||
+      actor.responsibilities.offices.includes('GENERAL_SECRETARY'))
+  );
+}
+
+/** Mirrors `fellowshipYear.requestClosure`. */
+export function canRequestYearClosure(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    isYearOpen(actor) &&
+    actor.responsibilities.offices.includes('GENERAL_SECRETARY')
+  );
+}
+
+/** Mirrors `fellowshipYear.confirmClosure`. */
+export function canConfirmYearClosure(actor: ActorProfile): boolean {
+  return actor.onboardingCompleted && isYearOpen(actor) && isChairman(actor);
+}
+
+/** Mirrors `fellowshipYear.archive`. */
+export function canArchiveYear(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    actor.operativeYear?.status === 'CLOSED' &&
+    isChairman(actor)
+  );
+}
+
+/** Mirrors `graduation.appointChairman`. */
+export function canAppointGraduationChairman(actor: ActorProfile): boolean {
+  return actor.onboardingCompleted && isYearOpen(actor) && isChairman(actor);
+}
+
+/** Graduation Chairman from `/auth/me`. */
+export function canDecideGraduation(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    actor.operativeYear !== null &&
+    actor.responsibilities.isGraduationChairman
+  );
+}
+
+/**
+ * Graduation page: Chairman (appoint), Graduation Chairman (queue), or any onboarded
+ * member with an operative year (apply / own status via `/graduation/me`).
+ */
+export function canViewGraduation(actor: ActorProfile): boolean {
+  return actor.onboardingCompleted && actor.operativeYear !== null;
+}
+
 /** Event list has no policy action: any onboarded member may read the operative-year list. */
 export function canViewEvents(actor: ActorProfile): boolean {
   return actor.onboardingCompleted;
@@ -128,6 +214,15 @@ export function canOperateEvent(actor: ActorProfile, eventId: string): boolean {
   );
 }
 
+/** Mirrors `event.join`: Active onboarded member, year OPEN (event ACTIVE checked in UI). */
+export function canJoinEvents(actor: ActorProfile): boolean {
+  return (
+    actor.onboardingCompleted &&
+    isYearOpen(actor) &&
+    actor.membershipStatus === 'ACTIVE'
+  );
+}
+
 /** Mirrors `event.close`. */
 export function canCloseEvent(actor: ActorProfile, eventId: string): boolean {
   return canOperateEvent(actor, eventId);
@@ -140,6 +235,26 @@ export function canManageEventAttendance(actor: ActorProfile, eventId: string): 
     isYearOpen(actor) &&
     (holdsEventRole(actor, eventId, 'EVENT_CHAIRMAN') ||
       holdsEventRole(actor, eventId, 'EVENT_SECRETARY'))
+  );
+}
+
+/** Mirrors `event.viewFinances` for a specific event (committee while year is operative). */
+export function canViewEventFinances(actor: ActorProfile, eventId: string): boolean {
+  return (
+    actor.onboardingCompleted &&
+    actor.operativeYear !== null &&
+    (holdsEventRole(actor, eventId, 'EVENT_CHAIRMAN') ||
+      holdsEventRole(actor, eventId, 'EVENT_TREASURER') ||
+      holdsEventRole(actor, eventId, 'EVENT_SECRETARY'))
+  );
+}
+
+/** Mirrors `event.manageFinances` for a specific event. */
+export function canManageEventFinances(actor: ActorProfile, eventId: string): boolean {
+  return (
+    actor.onboardingCompleted &&
+    isYearOpen(actor) &&
+    holdsEventRole(actor, eventId, 'EVENT_TREASURER')
   );
 }
 

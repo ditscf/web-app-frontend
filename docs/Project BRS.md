@@ -24,11 +24,15 @@ The system shall:
 
 The system shall:
 
-- Let an Event Chairman submit a graduation request to the Chairman.
-- Change the member to Associate only after the Chairman confirms.
+- Let the Chairman appoint a Graduation Chairman for the operative fellowship year (replaceable while the year is OPEN). Graduation Treasurer and Graduation General Secretary are out of the first version.
+- Let an Active Member apply for graduation once a Graduation Chairman is appointed.
+- Let the applicant cancel a pending application.
+- Change the member to Associate only after the Graduation Chairman confirms. The Graduation Chairman may reject a pending application.
 - Keep the Associate in the system.
+- Disable the Associate’s account and end open sessions.
 - Remove the Associate from ministries and events.
 - End the person's current ministry leadership and event roles. The ministry may then have no leader until the Chairman appoints one.
+- Not end fellowship offices on graduation (graduates do not hold those offices in fellowship practice).
 - Not provide Associate sign-in in the first version.
 
 ## 3. Leadership and roles
@@ -50,7 +54,7 @@ Ministry leadership rules:
 
 An office, ministry leadership, or event role counts only when it has not ended and belongs to the operative fellowship year, which is the one year that is OPEN or CLOSED. Fellowship officers are not replaced during a year in the first version.
 
-The Treasurer has no operational responsibility in the first version.
+The fellowship Treasurer records anonymous daily fellowship offerings (whole TZS) while the year is OPEN. The Chairman, Vice Chairman, General Secretary, Vice General Secretary, and Treasurer may view the offering list. While the year is CLOSED, only the Chairman may correct offerings. Event contributions are managed by the Event Treasurer for each event.
 
 The Vice Chairman may correct a CLOSED event and archive it. While a fellowship year is OPEN or CLOSED, the Vice Chairman may also view the fellowship member directory (see Member access).
 
@@ -77,9 +81,11 @@ The system shall:
 - Let the Chairman create an event and appoint the event committee.
 - Allow a person at most one current committee role per event.
 - Treat participant and attendee as one list.
-- Allow only an Active Member or an Associate to be added.
-- While the event is ACTIVE, let the Event Chairman manage participants, venue, and event operations.
-- Let the Event Treasurer manage that event’s contributions and event financial records, not fellowship-wide finance.
+- Allow only an Active Member or an Associate to participate.
+- While the event is ACTIVE and the year is OPEN, let an onboarded member join an event as a self participant, and withdraw if they joined themselves.
+- While the event is ACTIVE, let the Event Chairman add committee participants manually (tagged as committee). Those members cannot withdraw themselves.
+- While the event is ACTIVE, let the Event Chairman manage venue, committee participants, and event operations.
+- Let the Event Treasurer manage that event’s contributions and event financial records (pledges and payments in whole TZS), not fellowship-wide finance. The Event Chairman and Event Secretary may view that event’s contribution ledger. The Vice Chairman may correct contributions while the event is CLOSED.
 - Let the Event Secretary handle day-to-day event administration, including activities and event reporting.
 
 Event lifecycle:
@@ -136,7 +142,7 @@ The first version shall implement:
 
 It shall also implement fellowship-year governance, closure and preservation, and the role boundaries in this document.
 
-The first version shall not implement fellowship-wide attendance and engagement scoring, fellowship-wide financial management, full reporting and analytics, communication, or advanced ministry-specific tools. Event-scoped attendance (sessions and present-only marks) is in scope; the officer member directory (name and Fellowship ID with composition summaries) is in scope; event contributions follow that work.
+The first version shall not implement fellowship-wide attendance and engagement scoring, full fellowship-wide financial management beyond offerings, full reporting and analytics, communication, or advanced ministry-specific tools. Event-scoped attendance, the officer member directory, event contributions (pledges and payments), and fellowship offerings (anonymous daily totals) are in scope.
 
 ## 9. Success
 

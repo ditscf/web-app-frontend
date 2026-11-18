@@ -12,8 +12,8 @@ A person stays in the system across membership stages. History is not deleted.
 2. The General Secretary and the Vice General Secretary both take part in approval. One of them acting alone does not complete it.
 3. Approval creates a Fellowship ID and the person becomes an Active Member.
 4. If approval is not completed within 48 hours of submission, the application expires. The person must register again.
-5. Graduation: an Event Chairman sends a graduation request to the Chairman. The person becomes an Associate only after the Chairman confirms.
-6. An Associate remains in the system and does not belong to ministries or events. Associates do not sign in during the first version.
+5. Graduation: the Chairman appoints a Graduation Chairman. Active Members apply themselves. The person becomes an Associate only after the Graduation Chairman confirms.
+6. An Associate remains in the system and does not belong to ministries or events. Their account is disabled. Associates do not sign in during the first version.
 
 Registration requires email (the primary unique identifier), first name, last name, phone number, class, course, year of study, and date of birth. After approval, only the member may change those fields.
 
@@ -23,7 +23,7 @@ Applications and approvals continue while a fellowship year is CLOSED.
 
 Fellowship offices: Chairman, Vice Chairman, General Secretary, Vice General Secretary, and Treasurer.
 
-The Treasurer is an official role and has no operational work in the first version, because fellowship-wide finance is later work.
+The fellowship Treasurer is an official role and records anonymous daily offering totals while the year is OPEN. The five top officers may view those totals. While the year is CLOSED, only the Chairman may correct them. Broader fellowship-wide finance stays later work.
 
 While a fellowship year is OPEN, the Chairman starts the year, creates events, appoints Ministry Leaders and event committees, and manages ministry membership and event records.
 
@@ -43,12 +43,12 @@ Ministry attendance and engagement scoring are later work.
 
 Events are not hardcoded. The Chairman creates each event and appoints an Event Chairman, Event Treasurer, and Event Secretary. Those roles last for that event and are separate from fellowship offices.
 
-Participant and attendee are the same list. Only an Active Member or an Associate may be added.
+Participant and attendee are the same list. Only an Active Member or an Associate may participate. Members join themselves while the event is ACTIVE; they may withdraw a self join. The Event Chairman may add committee participants manually.
 
 While an event is ACTIVE:
 
-- The Event Chairman manages participants, venue, and event operations.
-- The Event Treasurer manages that event’s contributions and event financial records, not fellowship-wide finance.
+- The Event Chairman manages venue, committee participants, and event operations.
+- The Event Treasurer manages that event’s contributions (pledges and payments in whole TZS), not fellowship-wide finance. The Event Chairman and Event Secretary may view that ledger.
 - The Event Secretary handles day-to-day event administration, including activities and event reporting.
 
 Event lifecycle:

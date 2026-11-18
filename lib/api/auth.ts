@@ -42,6 +42,7 @@ const actorProfileSchema = z.object({
       .object({ ministry: z.object({ id: z.string(), name: z.string() }) })
       .nullable(),
     eventRoles: z.array(actorEventRoleSchema),
+    isGraduationChairman: z.boolean(),
   }),
 });
 

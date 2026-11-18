@@ -253,7 +253,7 @@ export function AssistedRegistrationForm({
           type='tel'
           inputMode='tel'
           maxLength={PHONE_MAX_LENGTH}
-          placeholder='+255 745 123 607'
+          placeholder='+255 745 000 000'
           value={data.phone}
           disabled={isSubmitting}
           onChange={(value) => updateField('phone', value)}
