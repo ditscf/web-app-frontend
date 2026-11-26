@@ -194,14 +194,10 @@ export function AssistedRegistrationForm({
   }
 
   return (
-    <Card className='relative overflow-hidden p-6 shadow-none'>
-      <div
-        className='pointer-events-none absolute inset-0 bg-brand-radial opacity-25'
-        aria-hidden
-      />
-      <div className='relative'>
+    <Card className='border border-border p-6 shadow-none ring-0'>
+      <div>
         <div className='flex items-start gap-3'>
-          <div className='flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary'>
+          <div className='flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent'>
             <UserPlus size={20} aria-hidden />
           </div>
           <div>
@@ -257,7 +253,7 @@ export function AssistedRegistrationForm({
           type='tel'
           inputMode='tel'
           maxLength={PHONE_MAX_LENGTH}
-          placeholder='+255 745 123 607'
+          placeholder='+255 745 000 000'
           value={data.phone}
           disabled={isSubmitting}
           onChange={(value) => updateField('phone', value)}

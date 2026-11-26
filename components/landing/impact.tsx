@@ -7,7 +7,8 @@ import { impactStats } from '@/lib/site-content';
 
 export function Impact() {
   return (
-    <section className='mx-auto w-full max-w-6xl px-4 py-20'>
+    <section className="bg-card py-20 md:py-24">
+      <div className="mx-auto w-full max-w-6xl px-4">
       <SectionHeader
         center
         eyebrow='Impact'
@@ -24,6 +25,7 @@ export function Impact() {
             </span>
           </Card>
         ))}
+      </div>
       </div>
     </section>
   );

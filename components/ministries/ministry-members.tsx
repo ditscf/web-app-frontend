@@ -5,11 +5,14 @@ import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { useCurrentActor } from '@/components/auth/current-actor-provider';
+import { EmptyState, ErrorState } from '@/components/dashboard/async-state';
 import {
   DashboardPage,
   dashboardCardClassName,
 } from '@/components/dashboard/dashboard-page';
 import { NoAccess } from '@/components/dashboard/no-access';
+import { PageHeader } from '@/components/dashboard/page-header';
+import { StatusBadge } from '@/components/dashboard/status-badge';
 import { FellowshipIdField } from '@/components/ministries/fellowship-id-field';
 import {
   AlertDialog,
@@ -98,13 +101,9 @@ function SummaryStat({
   hint?: string;
 }) {
   return (
-    <Card className={cn('relative overflow-hidden p-5', dashboardCardClassName)}>
-      <div
-        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-30"
-        aria-hidden
-      />
-      <div className="relative flex gap-4">
-        <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+    <Card className={cn('p-5', dashboardCardClassName)}>
+      <div className="flex gap-4">
+        <div className="flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent">
           <Icon size={20} aria-hidden />
         </div>
         <div className="min-w-0">
@@ -298,50 +297,49 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
 
   return (
     <DashboardPage>
-      <header className="relative isolate overflow-hidden border border-border bg-card">
-        <div
-          className="pointer-events-none absolute inset-0 bg-brand-radial opacity-50"
-          aria-hidden
-        />
-        <div className="relative border-b border-primary/25 bg-linear-to-r from-primary/12 via-primary/5 to-transparent px-6 py-8 sm:px-8">
-          <Link
-            href={MINISTRIES_PATH}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:text-primary/80 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <ArrowLeft size={16} aria-hidden />
-            Ministries
-          </Link>
-          <p className="mt-4 text-xs font-semibold tracking-widest text-primary uppercase">
-            Members
-          </p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            {ministryName ?? 'Ministry members'}
-          </h1>
-          {membersState.status === 'ready' ? (
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              {formatMemberCount(memberCount)} in this ministry
-              {leader ? (
-                <>
-                  {' '}
-                  · Led by{' '}
-                  <span className="font-semibold text-foreground">
-                    {getFullName(leader)}
-                  </span>
-                </>
-              ) : (
-                <> · No leader appointed yet</>
-              )}
-              .
-            </p>
-          ) : null}
-          {membersState.status === 'ready' && isYearClosedForManagers ? (
-            <p className="mt-2 text-sm text-muted-foreground">
-              The fellowship year is closed, so members can&apos;t be added or
-              removed.
-            </p>
-          ) : null}
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Members"
+        title={ministryName ?? 'Ministry members'}
+        description={
+          membersState.status === 'ready' ? (
+            <>
+              <Link
+                href={MINISTRIES_PATH}
+                className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
+              >
+                <ArrowLeft size={16} aria-hidden />
+                Ministries
+              </Link>
+              <span className="mt-2 block">
+                {formatMemberCount(memberCount)} in this ministry
+                {leader ? (
+                  <>
+                    {' '}
+                    · Led by{' '}
+                    <span className="font-semibold text-foreground">{getFullName(leader)}</span>
+                  </>
+                ) : (
+                  ' · No leader appointed yet'
+                )}
+                .
+              </span>
+              {isYearClosedForManagers ? (
+                <span className="mt-2 block">
+                  The fellowship year is closed, so members can&apos;t be added or removed.
+                </span>
+              ) : null}
+            </>
+          ) : (
+            <Link
+              href={MINISTRIES_PATH}
+              className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
+            >
+              <ArrowLeft size={16} aria-hidden />
+              Ministries
+            </Link>
+          )
+        }
+      />
 
       {membersState.status === 'ready' ? (
         <div className="grid min-w-0 gap-4 sm:grid-cols-2">
@@ -374,60 +372,29 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
       ) : null}
 
       {membersState.status === 'not_found' ? (
-        <Card className={cn('relative overflow-hidden p-6', dashboardCardClassName)}>
-          <div
-            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
-            aria-hidden
-          />
-          <div className="relative">
-            <p className="font-bold text-foreground">
-              We couldn&apos;t find that ministry.
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Choose a ministry from the list.
-            </p>
-            <Button asChild size="sm" className="mt-4">
+        <EmptyState
+          title="We couldn't find that ministry"
+          description="Choose a ministry from the list."
+          action={
+            <Button asChild size="sm">
               <Link href={MINISTRIES_PATH}>Back to ministries</Link>
             </Button>
-          </div>
-        </Card>
+          }
+        />
       ) : null}
 
       {membersState.status === 'error' ? (
-        <Card
-          role="alert"
-          className={cn('relative overflow-hidden p-6', dashboardCardClassName)}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
-            aria-hidden
-          />
-          <div className="relative">
-            <p className="font-bold text-foreground">
-              We couldn&apos;t load the members.
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {membersState.message}
-            </p>
-            <Button type="button" size="sm" className="mt-4" onClick={handleRetry}>
-              Try again
-            </Button>
-          </div>
-        </Card>
+        <ErrorState message={membersState.message} onRetry={handleRetry} />
       ) : null}
 
       {membersState.status === 'ready' &&
       canManage &&
       canLookupMember(actor) &&
       !isYearClosedForManagers ? (
-        <Card className={cn('relative overflow-hidden p-6', dashboardCardClassName)}>
-          <div
-            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-25"
-            aria-hidden
-          />
-          <div className="relative">
+        <Card className={cn('p-6', dashboardCardClassName)}>
+          <div>
             <div className="flex items-start gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+              <div className="flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent">
                 <UserPlus size={20} aria-hidden />
               </div>
               <div>
@@ -478,12 +445,10 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
           </div>
 
           {membersState.data.members.length === 0 ? (
-            <Card className={cn('p-6', dashboardCardClassName)}>
-              <p className="text-muted-foreground">
-                No one is in this ministry yet. When you add members, they will
-                appear here.
-              </p>
-            </Card>
+            <EmptyState
+              title="No members yet"
+              description="When you add members, they will appear here."
+            />
           ) : (
             <ul className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {membersState.data.members.map((member) => {
@@ -493,23 +458,16 @@ export function MinistryMembers({ ministryId }: { ministryId: string }) {
                   <li key={member.personId}>
                     <Card
                       className={cn(
-                        'flex h-full flex-col p-5 transition-colors',
+                        'flex h-full flex-col p-5',
                         dashboardCardClassName,
-                        isLeader
-                          ? 'border-primary/35 bg-primary/5'
-                          : 'hover:border-primary/30 hover:bg-primary/5',
+                        isLeader && 'border-accent/40',
                       )}
                     >
-                      <div className="mb-3 h-0.5 w-10 bg-primary" aria-hidden />
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <p className="font-bold text-foreground">
                           {getFullName(member)}
                         </p>
-                        {isLeader ? (
-                          <span className="shrink-0 bg-primary px-2 py-0.5 text-[0.625rem] font-semibold tracking-widest text-primary-foreground uppercase">
-                            Leader
-                          </span>
-                        ) : null}
+                        {isLeader ? <StatusBadge tone="accent">Leader</StatusBadge> : null}
                       </div>
                       <p className="mt-2 text-sm text-muted-foreground">
                         {member.fellowshipId} · since{' '}

@@ -9,7 +9,7 @@ export function About() {
   return (
     <section
       id='about'
-      className='mx-auto grid w-full max-w-6xl gap-10 px-4 py-20 lg:grid-cols-[0.85fr_1.15fr] lg:items-center'
+      className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-20 md:py-24 lg:grid-cols-[0.85fr_1.15fr] lg:items-center"
     >
       <motion.div
         className='relative min-h-[480px] overflow-hidden bg-cover bg-center shadow-lg'
@@ -40,7 +40,7 @@ export function About() {
           {pillars.map((pillar) => {
             const Icon = pillar.icon;
             return (
-              <Card key={pillar.label} className='flex items-center gap-3 p-4'>
+              <Card key={pillar.label} className="flex items-center gap-3 border border-border p-4 shadow-none ring-0">
                 <span className='grid size-11 place-items-center bg-accent/10 text-accent'>
                   <Icon size={20} />
                 </span>

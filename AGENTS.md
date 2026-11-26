@@ -84,7 +84,7 @@ MCP-specific workflows and decisions should be documented under `docs/mcp/`.
 
 ## Current Phase
 
-V1 dashboard features through `docs/roadmap.md` **Done** are implemented. **Next work is blocked on backend Event Management APIs**; follow `docs/roadmap.md` when those endpoints exist.
+V1 dashboard features through Event attendance are implemented (`docs/roadmap.md` **Done**). **Next work is blocked on backend event-contributions APIs**; follow `docs/roadmap.md` when those endpoints exist.
 
 When the parent workspace is open, shared coordination lives in `../docs/PROJECT_CONTEXT.md` (outside this Git repo).
 

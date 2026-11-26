@@ -23,8 +23,11 @@ DITSCF colors are mapped onto shadcn tokens (not custom Tailwind color names lik
 | Royal / links | `#0F3D91` | `--accent` |
 | Navy shells | `#07142F` | `--sidebar` |
 | Gold on navy | `#F4B400` | `--sidebar-primary` |
+| Success | dark green | `--success` |
+| Warning | dark amber | `--warning` |
+| Information | slate blue | `--info` |
 
-**Why:** Presets treat `--primary` as the main fill. DITSCF uses gold for buttons and navy for hero/footer/auth/dashboard chrome. Shells use `bg-sidebar`, not `bg-primary`.
+**Why:** Presets treat `--primary` as the main fill. DITSCF uses gold for buttons and navy for hero/footer/auth/dashboard chrome. Shells use `bg-sidebar`, not `bg-primary`. Status tokens label lifecycle states and must not replace the gold CTA.
 
 `--radius` is `0` so square corners stay even if a utility uses a radius token. Sera components also set `rounded-none`. Re-set `--radius: 0` after a preset rewrite if the new theme restores a larger radius and you still want sharp corners.
 

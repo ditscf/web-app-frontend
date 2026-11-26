@@ -11,11 +11,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useCurrentActor } from '@/components/auth/current-actor-provider';
 import { AssistedRegistrationForm } from '@/components/applications/assisted-registration-form';
+import { EmptyState, ErrorState } from '@/components/dashboard/async-state';
 import {
   DashboardPage,
   dashboardCardClassName,
 } from '@/components/dashboard/dashboard-page';
 import { NoAccess } from '@/components/dashboard/no-access';
+import { PageHeader } from '@/components/dashboard/page-header';
+import { StatusBadge } from '@/components/dashboard/status-badge';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -134,13 +137,9 @@ function SummaryStat({
   hint?: string;
 }) {
   return (
-    <Card className={cn('relative overflow-hidden p-5', dashboardCardClassName)}>
-      <div
-        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-30"
-        aria-hidden
-      />
-      <div className="relative flex gap-4">
-        <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+    <Card className={cn('p-5', dashboardCardClassName)}>
+      <div className="flex gap-4">
+        <div className="flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent">
           <Icon size={20} aria-hidden />
         </div>
         <div className="min-w-0">
@@ -288,65 +287,40 @@ export function ApplicationsReview() {
 
   return (
     <DashboardPage>
-      <header className="relative isolate overflow-hidden border border-border bg-card">
-        <div
-          className="pointer-events-none absolute inset-0 bg-brand-radial opacity-50"
-          aria-hidden
-        />
-        <div className="relative flex flex-wrap items-start justify-between gap-4 border-b border-primary/25 bg-linear-to-r from-primary/12 via-primary/5 to-transparent px-6 py-8 sm:px-8">
-          <div className="min-w-0 max-w-3xl">
-            <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-              Applications
-            </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Registration approvals
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-              {isRegistering ? (
-                'Register someone who cannot submit the public form themselves.'
-              ) : (
-                <>
-                  Self registrations need the General Secretary, then the Vice
-                  General Secretary. GS-assisted applications skip straight to
-                  the VGS. Each request expires{' '}
-                  <span className="font-semibold text-foreground">
-                    48 hours
-                  </span>{' '}
-                  after submission.
-                </>
-              )}
-            </p>
-            {!isRegistering ? (
-              <p className="mt-2 text-sm font-semibold text-foreground">
-                You are reviewing as{' '}
-                <span className="text-primary">{roleLabel}</span>.
-              </p>
-            ) : null}
-          </div>
-          {canRegister && !isRegistering ? (
-            <Button
-              type="button"
-              size="sm"
-              className="shrink-0 gap-2"
-              onClick={() => setIsRegistering(true)}
-            >
+      <PageHeader
+        eyebrow="Applications"
+        title="Registration approvals"
+        description={
+          isRegistering ? (
+            'Register someone who cannot submit the public form themselves.'
+          ) : (
+            <>
+              Self registrations need the General Secretary, then the Vice General
+              Secretary. GS-assisted applications skip straight to the VGS. Each
+              request expires <span className="font-semibold text-foreground">48 hours</span>{' '}
+              after submission. You are reviewing as {roleLabel}.
+            </>
+          )
+        }
+        actions={
+          canRegister && !isRegistering ? (
+            <Button type="button" size="sm" className="gap-2" onClick={() => setIsRegistering(true)}>
               <UserPlus size={16} aria-hidden />
               Register a member
             </Button>
-          ) : null}
-          {isRegistering ? (
+          ) : isRegistering ? (
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="shrink-0 normal-case tracking-normal"
+              className="normal-case tracking-normal"
               onClick={() => setIsRegistering(false)}
             >
               Back to queue
             </Button>
-          ) : null}
-        </div>
-      </header>
+          ) : null
+        }
+      />
 
       {isRegistering ? (
         <AssistedRegistrationForm
@@ -400,54 +374,16 @@ export function ApplicationsReview() {
       ) : null}
 
       {!isRegistering && listState.status === 'error' ? (
-        <Card
-          role="alert"
-          className={cn('relative overflow-hidden p-6', dashboardCardClassName)}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
-            aria-hidden
-          />
-          <div className="relative">
-            <p className="font-bold text-foreground">
-              We couldn&apos;t load the applications.
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {listState.message}
-            </p>
-            <Button type="button" size="sm" className="mt-4" onClick={handleRetry}>
-              Try again
-            </Button>
-          </div>
-        </Card>
+        <ErrorState message={listState.message} onRetry={handleRetry} />
       ) : null}
 
       {!isRegistering &&
       listState.status === 'ready' &&
       listState.applications.length === 0 ? (
-        <Card
-          className={cn(
-            'relative overflow-hidden p-8 text-center',
-            dashboardCardClassName,
-          )}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-35"
-            aria-hidden
-          />
-          <div className="relative mx-auto max-w-md">
-            <div className="mx-auto flex size-12 items-center justify-center bg-primary/15 text-primary">
-              <ClipboardCheck size={24} aria-hidden />
-            </div>
-            <p className="mt-4 text-lg font-bold text-foreground">
-              Queue is clear
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              No applications are waiting for approval right now. New sign-ups
-              will appear here when they need your step.
-            </p>
-          </div>
-        </Card>
+        <EmptyState
+          title="Queue is clear"
+          description="No applications are waiting for approval right now. New sign-ups will appear here when they need your step."
+        />
       ) : null}
 
       {!isRegistering &&
@@ -538,34 +474,21 @@ function ApplicationCard({
   return (
     <Card
       className={cn(
-        'relative flex h-full flex-col overflow-hidden p-6 transition-colors',
+        'flex h-full flex-col p-6',
         dashboardCardClassName,
-        canApprove && 'border-primary/30 bg-primary/[0.03]',
-        isUrgent && 'border-primary/40',
+        canApprove && 'border-accent/40',
+        isUrgent && 'border-warning/50',
       )}
     >
-      <div
-        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-0 transition-opacity hover:opacity-20"
-        aria-hidden
-      />
-      <div className="relative flex flex-1 flex-col">
-        <div className="mb-3 h-0.5 w-10 bg-primary" aria-hidden />
+      <div className="flex flex-1 flex-col">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-lg font-bold text-foreground">
                 {getFullName(application)}
               </h3>
-              {isAssisted ? (
-                <span className="bg-primary/15 px-2 py-0.5 text-[0.625rem] font-semibold tracking-widest text-primary uppercase">
-                  GS assisted
-                </span>
-              ) : null}
-              {canApprove ? (
-                <span className="bg-primary px-2 py-0.5 text-[0.625rem] font-semibold tracking-widest text-primary-foreground uppercase">
-                  Your step
-                </span>
-              ) : null}
+              {isAssisted ? <StatusBadge tone="info">GS assisted</StatusBadge> : null}
+              {canApprove ? <StatusBadge tone="accent">Your step</StatusBadge> : null}
             </div>
             <p className="mt-1 break-all text-sm text-muted-foreground">
               {applicant.email}
@@ -574,7 +497,7 @@ function ApplicationCard({
           <p
             className={cn(
               'inline-flex items-center gap-1.5 text-sm font-semibold',
-              isUrgent ? 'text-primary' : 'text-muted-foreground',
+              isUrgent ? 'text-warning' : 'text-muted-foreground',
             )}
           >
             <Clock size={16} aria-hidden />

@@ -174,15 +174,11 @@ export function EmailChangeCard({ email, onChanged }: EmailChangeCardProps) {
   }
 
   return (
-    <Card className={cn('relative overflow-hidden p-6', dashboardCardClassName)}>
-      <div
-        className='pointer-events-none absolute inset-0 bg-brand-radial opacity-20'
-        aria-hidden
-      />
-      <div className='relative'>
+    <Card className={cn('p-6', dashboardCardClassName)}>
+      <div>
         <div className='flex items-start justify-between gap-3'>
           <div className='flex items-start gap-3'>
-            <div className='flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary'>
+            <div className='flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent'>
               <Mail size={20} aria-hidden />
             </div>
             <h2 className='pt-2 text-lg font-bold text-foreground'>

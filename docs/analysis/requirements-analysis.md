@@ -455,7 +455,7 @@ The list below is the current V1 rule set. It replaces the earlier open question
 - Event leadership, separate from fellowship offices: Event Chairman, Event Treasurer, Event Secretary.
 - Ministry Leaders, appointed by the Chairman for one ministry in one fellowship year. See "Scoped responsibilities" below.
 - Active Member and Associate. An Associate is a graduated member who remains in the system. Members are not deleted after graduation.
-- The Treasurer has no operational responsibility in V1.
+- The fellowship Treasurer records anonymous daily fellowship offerings (whole TZS, one total per calendar day) while the year is OPEN. The five top officers (Chairman, Vice Chairman, GS, VGS, Treasurer) may view the list. While the year is CLOSED, only the Chairman may correct offerings. Event contributions are handled by the Event Treasurer per event.
 
 **Approval and profile**
 
@@ -484,8 +484,9 @@ The list below is the current V1 rule set. It replaces the earlier open question
 
 - The Chairman creates the event and appoints the committee.
 - Participant and attendee are the same list.
-- Only an Active Member or an Associate may be added. Visitors are not in V1.
-- While the event is ACTIVE: the Event Chairman may add or remove participants, set or change the venue, and manage event operations. The Event Treasurer manages that event’s contributions and other event financial records, not fellowship-wide finance. The Event Secretary handles day-to-day event administration, including activities and event reporting.
+- Only an Active Member or an Associate may participate. Visitors are not in V1.
+- Participants have a join source: `SELF` (member joined) or `COMMITTEE` (Event Chairman / Vice Chairman added, or created when a committee role is appointed). Members may join and withdraw `SELF` while the event is ACTIVE and the year is OPEN. `COMMITTEE` participants cannot withdraw themselves.
+- While the event is ACTIVE: the Event Chairman may add or remove `COMMITTEE` participants, set or change the venue, and manage event operations. The Event Chairman or Event Secretary may create event sessions and mark present-only attendance for current participants. The Event Treasurer records pledges and payments (whole TZS) for current participants; outstanding = pledge − paid; a payment may not exceed the remaining balance. The Event Chairman, Event Treasurer, and Event Secretary may view that event’s contribution ledger. The Event Secretary handles day-to-day event administration, including activities and event reporting.
 - Lifecycle: ACTIVE → CLOSED → ARCHIVED.
 - The Event Chairman closes the event. While CLOSED, only the Vice Chairman may correct it. The Vice Chairman archives it. ARCHIVED cannot be changed by anyone.
 
@@ -511,8 +512,10 @@ The list below is the current V1 rule set. It replaces the earlier open question
 
 **Graduation**
 
-- An Event Chairman marks the member as a graduation candidate and sends that request to the Chairman.
-- The member becomes an Associate only after the Chairman confirms.
+- The Chairman appoints a Graduation Chairman for the operative year. Graduation Treasurer / GS are out of V1.
+- An Active Member may apply once a Graduation Chairman is appointed. Profile year of study is the year they joined the fellowship and is not used for eligibility. The applicant may cancel a pending application.
+- The member becomes an Associate only after the Graduation Chairman confirms. The Graduation Chairman may reject a pending application.
+- Confirmation disables the account, revokes sessions, ends ministry memberships and leadership, and ends event roles and participations. Fellowship offices are not ended on graduation.
 - After that, the Associate does not belong to ministries or events. The person remains in the system.
 
 **Scoped responsibilities — approved by the project owner**
@@ -541,7 +544,7 @@ Events:
 14. Graduation ends the person's current ministry leadership and event roles. The ministry may then have no leader until the Chairman appoints one.
 15. Archiving an event or a year records an end date on assignments that are still open, for history. Access decisions do not depend on those end dates.
 
-Rules 4, 5, and 12–15 describe workflows (appointment, replacement, year closure and archive, graduation) that are not built yet. They are recorded here so those workflows follow them.
+Rules 4, 5, and 12–15 describe workflows that the frontend consumes after the matching backend step ships. Graduation (Rule 14) is step 13.
 
 **Member profile — approved by the project owner**
 
@@ -563,6 +566,14 @@ Rules 4, 5, and 12–15 describe workflows (appointment, replacement, year closu
 - An Active Member can view the ministries they currently belong to, in any year state. This is the "their ministries" view in BRS section 7.
 - The Chairman, the General Secretary, the Vice General Secretary, and current-year Ministry Leaders can look up a member by Fellowship ID while the year is OPEN or CLOSED. The lookup shows only the member's name, Fellowship ID, membership status, and whether they have finished onboarding. It exists so the person can be confirmed before an appointment or a membership change.
 
+**Member directory — approved by the project owner on 2026-11-15**
+
+- While the year is OPEN or CLOSED, the Chairman, Vice Chairman, General Secretary, and Vice General Secretary may view a fellowship-wide member directory of Active Members and Associates.
+- Each directory row shows first name, last name, and Fellowship ID only. Email, phone, and date of birth are not shown.
+- Officers may search by name or Fellowship ID and filter by membership status and onboarding state.
+- Composition summaries (counts by status, onboarded vs not, and year of study) are allowed for the same filtered population. This is operational oversight for top officers, not the deferred Reporting and Analytics module.
+- Ministry Leaders do not receive the fellowship-wide directory; they continue to use ministry member lists and Fellowship ID lookup.
+
 **Ministry rule changes — approved by the project owner on 2026-10-05**
 
 After frontend testing, the project owner changed two ministry rules. The wording above (the "Ministry" summary, Ministry leadership rule 4, and "Ministry membership") already reflects them.
@@ -582,15 +593,13 @@ None. The five modules can move into detailed design.
 
 ## Deferred
 
-- Additional Vice Chairman duties while a year is OPEN.
-- Additional Vice General Secretary duties beyond joint approval.
 - Associate sign-in and other Associate operations.
-- Attendance, engagement, fellowship-wide finance, reporting and analytics, communication, and advanced ministry tools.
+- Attendance (fellowship-wide), engagement, full fellowship-wide finance beyond offerings, full reporting and analytics, communication, and advanced ministry tools.
 
 ## Original document conflicts kept for reference
 
 - Communication is later work in the Vision and required in the BRS. V1 excludes it.
 - The Vision says members may view records. The BRS requires member accounts. V1 includes Member Access for Active Members, with the visibility rules above. Associates do not sign in during V1.
 - The BRS allows event chairpersons to close events. The team decision is that the Event Chairman closes the event.
-- The Vision and BRS describe attendance, finance, and reporting. Those stay out of V1. Event Treasurer records are limited to that event.
+- Fellowship-wide attendance, engagement scoring, full reporting, and broader fellowship finance stay out of V1 except **event-scoped** attendance, the **officer member directory**, **event contributions**, and **fellowship offerings** (anonymous daily totals). Event Treasurer records remain limited to that event.
 

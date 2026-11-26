@@ -23,6 +23,7 @@ Technical design for how the DITSCF-MS frontend builds its interface: the layers
 | Verification code input | `input-otp`, the package shadcn uses with Radix (Radix has no OTP part) |
 | Toasts | `sonner`, with `next-themes` for the light or dark theme |
 | Icons | `lucide-react` (UI / feature); `react-icons` for brand/social marks Lucide no longer ships |
+| Charts | shadcn `Chart` + `recharts` — used on the officer member directory |
 | Date picker | shadcn `Calendar` + `Popover` (Radix) + `react-day-picker` / `date-fns` — used on sign-up DOB |
 | Class names | `cn` from `@/lib/utils`, which re-exports shadcn's `cn` package (it replaces `clsx` and `tailwind-merge`) |
 | Variants | `class-variance-authority` |
@@ -45,6 +46,15 @@ DITSCF brand colors are mapped onto shadcn semantic tokens. There are **no** cus
 | Gold on navy | `#F4B400` | `--sidebar-primary` | accents inside navy shells |
 | Page / cards | light / white | `--background`, `--card` | page wash and elevated surfaces |
 | Body ink | dark navy | `--foreground`, `--card-foreground` | default readable text |
+| Success | dark green | `--success` | open, active, present |
+| Warning | dark amber | `--warning` | closed, pending, needs care |
+| Information | slate blue | `--info` | notes that are not a CTA |
+
+Status colors are for lifecycle labels. They are not brand fills. Gold stays on buttons. Use `StatusBadge` (`components/dashboard/status-badge.tsx`) instead of a gold chip for year, event, and membership state.
+
+### Type and elevation
+
+Inter is the only typeface. Public section eyebrows stay `text-xs font-semibold uppercase tracking-widest`. Dashboard page titles stay sentence case (`text-2xl` / `sm:text-3xl font-bold tracking-tight`). Operational cards use a hairline border. `--shadow-elevated` and `--shadow-overlay` are for menus and overlays, not for every card. Corners stay square (`--radius: 0`).
 
 ### Why this mapping exists
 

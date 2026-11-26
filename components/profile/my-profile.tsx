@@ -13,11 +13,13 @@ import {
   useCurrentActor,
   useRefreshCurrentActor,
 } from '@/components/auth/current-actor-provider';
+import { ErrorState } from '@/components/dashboard/async-state';
 import {
   DashboardPage,
   dashboardCardClassName,
 } from '@/components/dashboard/dashboard-page';
 import { NoAccess } from '@/components/dashboard/no-access';
+import { PageHeader } from '@/components/dashboard/page-header';
 import { EmailChangeCard } from '@/components/profile/email-change-card';
 import { ProfileDetailsForm } from '@/components/profile/profile-details-form';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -66,13 +68,9 @@ function SummaryStat({
   hint?: string;
 }) {
   return (
-    <Card className={cn('relative overflow-hidden p-5', dashboardCardClassName)}>
-      <div
-        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-30"
-        aria-hidden
-      />
-      <div className="relative flex gap-4">
-        <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+    <Card className={cn('p-5', dashboardCardClassName)}>
+      <div className="flex gap-4">
+        <div className="flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent">
           <Icon size={20} aria-hidden />
         </div>
         <div className="min-w-0">
@@ -103,21 +101,11 @@ function ProfileSectionCard({
   className?: string;
 }) {
   return (
-    <Card
-      className={cn(
-        'relative overflow-hidden p-6',
-        dashboardCardClassName,
-        className,
-      )}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
-        aria-hidden
-      />
-      <div className="relative">
+    <Card className={cn('p-6', dashboardCardClassName, className)}>
+      <div>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+            <div className="flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent">
               <Icon size={20} aria-hidden />
             </div>
             <h2 className="pt-2 text-lg font-bold text-foreground">{title}</h2>
@@ -243,34 +231,18 @@ export function MyProfile() {
 
   return (
     <DashboardPage>
-      <header className="relative isolate overflow-hidden border border-border bg-card">
-        <div
-          className="pointer-events-none absolute inset-0 bg-brand-radial opacity-50"
-          aria-hidden
-        />
-        <div className="relative border-b border-primary/25 bg-linear-to-r from-primary/12 via-primary/5 to-transparent px-6 py-8 sm:px-8">
-          <div className="flex flex-wrap items-center gap-5">
-            <Avatar className="size-16 border-2 border-primary/30">
-              <AvatarFallback className="bg-primary text-lg font-bold text-primary-foreground">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-                My profile
-              </p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {displayName}
-              </h1>
-              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-                Your details as the fellowship keeps them. Update contact info
-                here; Fellowship ID and membership status are managed by the
-                fellowship.
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="My profile"
+        title={displayName}
+        description="Your details as the fellowship keeps them. Update contact info here; Fellowship ID and membership status are managed by the fellowship."
+        leading={
+          <Avatar className="size-16">
+            <AvatarFallback className="bg-accent text-lg font-bold text-accent-foreground">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+        }
+      />
 
       {profileState.status === 'ready' ? (
         <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -306,26 +278,7 @@ export function MyProfile() {
       ) : null}
 
       {profileState.status === 'error' ? (
-        <Card
-          role="alert"
-          className={cn('relative overflow-hidden p-6', dashboardCardClassName)}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 bg-brand-radial opacity-20"
-            aria-hidden
-          />
-          <div className="relative">
-            <p className="font-bold text-foreground">
-              We couldn&apos;t load your profile.
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {profileState.message}
-            </p>
-            <Button type="button" size="sm" className="mt-4" onClick={handleRetry}>
-              Try again
-            </Button>
-          </div>
-        </Card>
+        <ErrorState message={profileState.message} onRetry={handleRetry} />
       ) : null}
 
       {profileState.status === 'ready' ? (
@@ -408,10 +361,6 @@ export function MyProfile() {
                     value={formatDateOfBirth(profileState.profile.dateOfBirth)}
                   />
                 </dl>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Date of birth and membership status cannot be changed here.
-                  Contact fellowship leadership if something looks wrong.
-                </p>
               </ProfileSectionCard>
             ) : null}
           </div>

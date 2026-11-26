@@ -8,7 +8,7 @@ import { testimonials } from '@/lib/site-content';
 
 export function Testimonials() {
   return (
-    <section className='bg-muted py-20'>
+    <section className="bg-background py-20 md:py-24">
       <div className='mx-auto w-full max-w-6xl px-4'>
         <SectionHeader
           center
@@ -17,7 +17,7 @@ export function Testimonials() {
         />
         <div className='mt-10 grid gap-5 lg:grid-cols-3'>
           {testimonials.map((item) => (
-            <Card key={item.name} className='p-7'>
+            <Card key={item.name} className="border border-border p-7 shadow-none ring-0">
               <span className='grid size-12 place-items-center bg-primary/20 text-primary'>
                 <MessageCircleHeart size={22} />
               </span>

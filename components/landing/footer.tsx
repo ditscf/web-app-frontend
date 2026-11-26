@@ -1,32 +1,28 @@
 'use client';
 
 import { MapPin } from 'lucide-react';
-import Image from 'next/image';
+import { BrandLockup } from '@/components/landing/brand-lockup';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ditscfLogoImage, navItems, socialLinks } from '@/lib/site-content';
+import { navItems, socialLinks } from '@/lib/site-content';
 
 export function Footer() {
   return (
-    <footer className="bg-sidebar py-14 text-sidebar-foreground">
+    <footer className="bg-sidebar py-16 text-sidebar-foreground md:py-20">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <div className="flex items-center gap-3">
-            <Image src={ditscfLogoImage} alt="DITSCF Logo" className="h-12 w-auto object-contain" />
-            <div>
-              <strong className="block text-xl font-bold text-sidebar-primary">DITSCF</strong>
-              <span className="text-sm text-sidebar-foreground/60">One Family For Gospel</span>
-            </div>
-          </div>
-          <p className="mt-6 max-w-xl leading-8 text-sidebar-foreground/62">
+          <BrandLockup href="/#home" size="large" />
+          <p className="mt-6 max-w-xl text-base leading-8 text-sidebar-foreground/70">
             Dar es Salaam Institute of Technology Students Christian Fellowship exists to raise
             Christ-centered students who worship, lead, serve, and transform communities.
           </p>
         </div>
         <div className="grid gap-8 sm:grid-cols-2">
           <div>
-            <h3 className="font-bold text-sidebar-primary">Navigation</h3>
-            <div className="mt-4 grid gap-3 text-sidebar-foreground/70">
+            <h2 className="text-sm font-bold tracking-widest text-sidebar-primary uppercase">
+              Navigation
+            </h2>
+            <div className="mt-4 grid gap-3 text-sm text-sidebar-foreground/75">
               {navItems.map((item) => (
                 <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-sidebar-foreground">
                   {item}
@@ -35,10 +31,12 @@ export function Footer() {
             </div>
           </div>
           <div>
-            <h3 className="font-bold text-sidebar-primary">Connect with us</h3>
+            <h2 className="text-sm font-bold tracking-widest text-sidebar-primary uppercase">
+              Connect with us
+            </h2>
             <ul className="mt-4 flex flex-col gap-4">
-              <li className="flex items-center gap-3 text-sm font-semibold text-sidebar-foreground/78">
-                <MapPin className="size-7 shrink-0 text-sidebar-foreground" aria-hidden />
+              <li className="flex items-center gap-3 text-sm font-semibold text-sidebar-foreground/80">
+                <MapPin className="size-5 shrink-0" aria-hidden />
                 Dar es Salaam, Tanzania
               </li>
               {socialLinks.map((link) => {
@@ -48,10 +46,10 @@ export function Footer() {
                     <Button
                       asChild
                       variant="ghost"
-                      className="h-auto justify-start gap-3 p-0 text-sm font-semibold normal-case tracking-normal text-sidebar-foreground hover:bg-transparent hover:text-sidebar-foreground/70 [&_svg]:size-7!"
+                      className="h-auto justify-start gap-3 p-0 text-sm font-semibold tracking-normal text-sidebar-foreground normal-case hover:bg-transparent hover:text-sidebar-primary [&_svg]:size-5!"
                     >
                       <a href={link.href} target="_blank" rel="noopener noreferrer">
-                        <Icon size={28} aria-hidden />
+                        <Icon size={20} aria-hidden />
                         {link.label}
                       </a>
                     </Button>
@@ -62,8 +60,8 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <Separator className="mx-auto mt-12 w-full max-w-6xl bg-sidebar-foreground/10 px-4" />
-      <div className="mx-auto w-full max-w-6xl px-4 pt-6 text-center text-sm text-sidebar-foreground/46">
+      <Separator className="mx-auto mt-12 w-full max-w-6xl bg-sidebar-foreground/10" />
+      <div className="mx-auto w-full max-w-6xl px-4 pt-6 text-center text-sm text-sidebar-foreground/50">
         © 2026 DIT Students Christian Fellowship. All rights reserved.
       </div>
     </footer>

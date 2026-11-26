@@ -2,11 +2,14 @@
 
 import { CalendarDays, IdCard, Sparkles } from 'lucide-react';
 import { useCurrentActor } from '@/components/auth/current-actor-provider';
+import { EmptyState } from '@/components/dashboard/async-state';
 import {
   DashboardPage,
   dashboardCardClassName,
 } from '@/components/dashboard/dashboard-page';
 import { NeedsAttention } from '@/components/dashboard/needs-attention';
+import { PageHeader } from '@/components/dashboard/page-header';
+import { StatusBadge } from '@/components/dashboard/status-badge';
 import { Card } from '@/components/ui/card';
 import type { ActorProfile } from '@/lib/api/auth';
 import {
@@ -62,13 +65,9 @@ function SummaryStat({
   hint?: string;
 }) {
   return (
-    <Card className={cn('relative overflow-hidden p-5', dashboardCardClassName)}>
-      <div
-        className="pointer-events-none absolute inset-0 bg-brand-radial opacity-30"
-        aria-hidden
-      />
-      <div className="relative flex gap-4">
-        <div className="flex size-10 shrink-0 items-center justify-center bg-primary/15 text-primary">
+    <Card className={cn('p-5', dashboardCardClassName)}>
+      <div className="flex gap-4">
+        <div className="flex size-10 shrink-0 items-center justify-center bg-accent/10 text-accent">
           <Icon size={20} aria-hidden />
         </div>
         <div className="min-w-0">
@@ -93,29 +92,20 @@ export function HomeOverview() {
 
   return (
     <DashboardPage>
-      <header className="relative isolate overflow-hidden border border-border bg-card">
-        <div
-          className="pointer-events-none absolute inset-0 bg-brand-radial opacity-50"
-          aria-hidden
-        />
-        <div className="relative border-b border-primary/25 bg-linear-to-r from-primary/12 via-primary/5 to-transparent px-6 py-8 sm:px-8">
-          <p className="text-xs font-semibold tracking-widest text-primary uppercase">
-            Home
-          </p>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Welcome back, {actor.firstName}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-            Your fellowship overview for{' '}
-            {operativeYear ? (
-              <span className="font-semibold text-foreground">{operativeYear.label}</span>
-            ) : (
-              'the current season'
-            )}
-            .
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Home"
+        title={`Welcome back, ${actor.firstName}`}
+        description={
+          operativeYear ? (
+            <>
+              Your fellowship overview for{' '}
+              <span className="font-semibold text-foreground">{operativeYear.label}</span>.
+            </>
+          ) : (
+            'Your fellowship overview for the current season.'
+          )
+        }
+      />
 
       <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <SummaryStat
@@ -172,16 +162,9 @@ export function HomeOverview() {
             </p>
           </div>
           {operativeYear ? (
-            <span
-              className={cn(
-                'inline-flex items-center px-2.5 py-1 text-xs font-semibold tracking-wide uppercase',
-                yearIsOpen
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground',
-              )}
-            >
+            <StatusBadge tone={yearIsOpen ? 'success' : 'warning'}>
               {YEAR_STATUS_LABELS[operativeYear.status]}
-            </span>
+            </StatusBadge>
           ) : null}
         </div>
 
@@ -189,13 +172,7 @@ export function HomeOverview() {
           <ul className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {responsibilityItems.map((item) => (
               <li key={item.key}>
-                <Card
-                  className={cn(
-                    'h-full p-5 transition-colors hover:border-primary/30 hover:bg-primary/5',
-                    dashboardCardClassName,
-                  )}
-                >
-                  <div className="mb-3 h-0.5 w-10 bg-primary" aria-hidden />
+                <Card className={cn('h-full p-5', dashboardCardClassName)}>
                   <p className="font-semibold text-foreground">{item.title}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {item.detail}
@@ -205,12 +182,10 @@ export function HomeOverview() {
             ))}
           </ul>
         ) : (
-          <Card className={cn('p-6', dashboardCardClassName)}>
-            <p className="text-muted-foreground">
-              You don&apos;t hold any responsibilities this year. When you&apos;re
-              appointed to a role, it will show up here.
-            </p>
-          </Card>
+          <EmptyState
+            title="No responsibilities this year"
+            description="When you are appointed to a role, it will show up here."
+          />
         )}
       </section>
     </DashboardPage>

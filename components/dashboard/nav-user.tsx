@@ -40,7 +40,7 @@ function UserAvatar({ initials, className }: { initials: string; className?: str
   );
 }
 
-export function DashboardNavUser() {
+export function DashboardNavUser({ surface = 'sidebar' }: { surface?: 'sidebar' | 'header' }) {
   const actor = useCurrentActor();
   const { isMobile, setOpenMobile } = useSidebar();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -61,26 +61,38 @@ export function DashboardNavUser() {
     }
   }
 
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
+  const menu = (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
-            >
-              <UserAvatar initials={initials} className="size-8" />
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{fullName}</span>
-                <span className="truncate text-xs text-sidebar-foreground/70">{actor.email}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
+            {surface === 'header' ? (
+              <button
+                type="button"
+                className="flex max-w-56 items-center gap-2 px-1.5 py-1 text-left text-foreground hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+              >
+                <UserAvatar initials={initials} className="size-8" />
+                <span className="hidden min-w-0 sm:block">
+                  <span className="block truncate text-sm font-semibold">{actor.firstName}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{actor.fellowshipId}</span>
+                </span>
+                <ChevronsUpDown className="size-4 text-muted-foreground" />
+              </button>
+            ) : (
+              <SidebarMenuButton
+                size="lg"
+                className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
+              >
+                <UserAvatar initials={initials} className="size-8" />
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{fullName}</span>
+                  <span className="truncate text-xs text-sidebar-foreground/70">{actor.email}</span>
+                </div>
+                <ChevronsUpDown className="ml-auto size-4" />
+              </SidebarMenuButton>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56"
-            side={isMobile ? 'bottom' : 'right'}
+            side={surface === 'header' || isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >
@@ -121,7 +133,13 @@ export function DashboardNavUser() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </SidebarMenuItem>
+  );
+
+  if (surface === 'header') return menu;
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>{menu}</SidebarMenuItem>
     </SidebarMenu>
   );
 }

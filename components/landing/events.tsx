@@ -13,7 +13,7 @@ export function Events() {
   return (
     <section
       id='events'
-      className='overflow-hidden bg-sidebar py-20 text-sidebar-foreground'
+      className="overflow-hidden bg-sidebar py-20 text-sidebar-foreground md:py-24"
     >
       <div className='mx-auto w-full max-w-6xl px-4'>
         <SectionHeader
